@@ -127,17 +127,17 @@ a/t*100%
 */
 
 #pgus img:nth-of-type(1) {
-  -webkit-animation-delay: 6s;
-  -moz-animation-delay: 6s;
-  -o-animation-delay: 6s;
-  animation-delay: 6s;
+  -webkit-animation-delay: 8s;
+  -moz-animation-delay: 8s;
+  -o-animation-delay: 8s;
+  animation-delay: 8s;
 }
 
 #pgus img:nth-of-type(2) {
-  -webkit-animation-delay: 3s;
-  -moz-animation-delay: 3s;
-  -o-animation-delay: 3s;
-  animation-delay: 3s;
+  -webkit-animation-delay: 4s;
+  -moz-animation-delay: 4s;
+  -o-animation-delay: 4s;
+  animation-delay: 4s;
 }
 
 #pgus img:nth-of-type(3) {
@@ -151,25 +151,25 @@ a/t*100%
   -webkit-animation-name: fadeinout;
   -webkit-animation-timing-function: ease-in-out;
   -webkit-animation-iteration-count: infinite;
-  -webkit-animation-duration: 9s;
+  -webkit-animation-duration: 12s;
   /*-webkit-animation-direction: alternate;*/
 
   -moz-animation-name: fadeinout;
   -moz-animation-timing-function: ease-in-out;
   -moz-animation-iteration-count: infinite;
-  -moz-animation-duration: 9s;
+  -moz-animation-duration: 12s;
   /*-moz-animation-direction: alternate;*/
 
   -o-animation-name: fadeinout;
   -o-animation-timing-function: ease-in-out;
   -o-animation-iteration-count: infinite;
-  -o-animation-duration: 9s;
+  -o-animation-duration: 12s;
   /*-o-animation-direction: alternate;*/
 
   animation-name: fadeinout;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
-  animation-duration: 9s;
+  animation-duration: 12s;
   /*animation-direction: alternate;*/
 
 }
@@ -178,13 +178,13 @@ a/t*100%
   0% {
     opacity: 1;
   }
-  25% {
+  27% {
     opacity: 1;
   }
   33% {
     opacity: 0;
   }
-  91% {
+  93% {
     opacity: 0;
   }
   100% {
@@ -196,13 +196,13 @@ a/t*100%
   0% {
     opacity: 1;
   }
-  25% {
+  27% {
     opacity: 1;
   }
   33% {
     opacity: 0;
   }
-  91% {
+  93% {
     opacity: 0;
   }
   100% {
@@ -214,13 +214,13 @@ a/t*100%
   0% {
     opacity: 1;
   }
-  25% {
+  27% {
     opacity: 1;
   }
   33% {
     opacity: 0;
   }
-  91% {
+  93% {
     opacity: 0;
   }
   100% {
