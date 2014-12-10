@@ -85,6 +85,7 @@ body {
 }
 
 #pgus {
+  display: block;
   position: relative;
   margin-top: 10px;
   margin-bottom: 30px;
@@ -92,6 +93,7 @@ body {
   margin-right: auto;
   width: 250px;
   height: 84px;
+  cursor: pointer;
 }
 
 #pgus img {
