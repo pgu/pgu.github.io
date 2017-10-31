@@ -492,6 +492,27 @@
   };
 </script>
 
+<script src='js/mousetrap.min.js'></script>
+<script>
+  Mousetrap.bind('x', function() { displayCodepen(); }, 'keyup');
+
+  function displayCodepen() {
+
+    if ($('.codepen').length) {
+      return;
+    }
+
+    var $div = $(''+
+      '<div class="codepen">' +
+      ' <a target="_blank" href="https://codepen.io/pgu/pen/wdKxJa">LESS functions</a>' +
+      ' <a target="_blank" href="https://codepen.io/pgu/pen/NaZVqJ">Sonar by Preddict</a>' +
+      ' <a target="_blank" href="https://codepen.io/pgu/pen/XeyrQK">Sonar by JIRA</a>' +
+    '</div>');
+    $('.container').append($div);
+  }
+
+</script>
+
 </body>
 
 </html>
