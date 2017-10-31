@@ -380,8 +380,8 @@
   (function (i, s, o, g, r, a, m) {
     i[ 'GoogleAnalyticsObject' ] = r;
     i[ r ] = i[ r ] || function () {
-        (i[ r ].q = i[ r ].q || []).push(arguments)
-      }, i[ r ].l = 1 * new Date();
+      (i[ r ].q = i[ r ].q || []).push(arguments)
+    }, i[ r ].l = 1 * new Date();
     a = s.createElement(o),
       m = s.getElementsByTagName(o)[ 0 ];
     a.async = 1;
@@ -494,20 +494,22 @@
 
 <script src='js/mousetrap.min.js'></script>
 <script>
-  Mousetrap.bind('x', function() { displayCodepen(); }, 'keyup');
+  Mousetrap.bind('x', function () {
+    displayCodepen();
+  }, 'keyup');
 
-  function displayCodepen() {
+  function displayCodepen () {
 
     if ($('.codepen').length) {
       return;
     }
 
-    var $div = $(''+
+    var $div = $('' +
       '<div class="codepen">' +
       ' <a target="_blank" href="https://codepen.io/pgu/pen/wdKxJa">LESS functions</a>' +
       ' <a target="_blank" href="https://codepen.io/pgu/pen/NaZVqJ">Sonar by Preddict</a>' +
       ' <a target="_blank" href="https://codepen.io/pgu/pen/XeyrQK">Sonar by JIRA</a>' +
-    '</div>');
+      '</div>');
     $('.container').append($div);
   }
 
