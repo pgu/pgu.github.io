@@ -84,7 +84,7 @@ window.JOBS = [
     start: [2023, 5], end: [2025, 5], place: 'Nantes, France',
     blurb: 'Front-end engineer on API Designer, working closely with UX and Product.',
     points: [
-      'Designed and built API product features, incl. an AI-assisted API creation flow and Folders: requirements and flows in Miro, designs in Figma, user research, in-product guidance with Pendo, React migration from AngularJS.',
+      'Designed and built API product features, incl. an AI-assisted API creation flow: requirements and flows in Miro, designs in Figma, user research, in-product guidance with Pendo, React migration from AngularJS.',
       'Analyzed the API lifecycle ecosystem (OpenAPI, Overlays, Arazzo, TypeSpec) and the Data & Integration markets (iPaaS, API management, RPA, BI, data quality).',
       'Certified across Talend and Qlik platforms (9 practitioner-level credentials, 2023).'
     ],
