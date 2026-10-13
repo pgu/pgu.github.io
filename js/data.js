@@ -9,7 +9,7 @@ window.PROFILE = {
     'I design data integration and API software at Qlik, after two decades building it as a software engineer. ' +
     'I can sit with users in an interview, sketch the flow, check it against the market, and then talk implementation ' +
     'with the engineers who will build it.',
-  languages: ['French (native)', 'English (professional)', 'Spanish (professional)', 'German (working)', 'Italian (working)'],
+  languages: ['French (native)', 'English (professional)', 'Spanish (professional)', 'German (elementary)', 'Italian (elementary)'],
   links: [
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/pascal-guilcher/' },
     { label: 'GitHub', url: 'https://github.com/pgu' }

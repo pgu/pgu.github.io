@@ -36,10 +36,6 @@ h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); letter-spacing: -.02em; }
 }
 .links a:hover { border-color: var(--accent); text-decoration: none; }
 
-.stats { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; padding: 0; margin: 28px 0 0; }
-.stats li { flex: 1 1 140px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; }
-.stats b { display: block; font-size: 26px; line-height: 1.1; }
-.stats span { color: var(--muted); font-size: 13px; }
 
 /* ---- tabs ---- */
 .tabs {

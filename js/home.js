@@ -37,22 +37,6 @@
       a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
       $('links').appendChild(a);
     });
-    var techs = {}, orgs = {};
-    workJobs().forEach(function (j) {
-      orgs[j.org.split(' @ ')[0]] = 1;
-      j.tech.forEach(function (t) { techs[t] = 1; });
-    });
-    [
-      [now.getFullYear() - P.careerStart + '+', 'years in software'],
-      [Object.keys(orgs).length, 'organisations'],
-      [Object.keys(techs).length, 'technologies & practices'],
-      [Object.keys(P.languages).length, 'spoken languages']
-    ].forEach(function (s) {
-      var li = el('li');
-      li.appendChild(el('b', null, String(s[0])));
-      li.appendChild(el('span', null, s[1]));
-      $('stats').appendChild(li);
-    });
   }
 
   /* ---------- tech chips ---------- */
