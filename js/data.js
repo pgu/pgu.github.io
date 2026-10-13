@@ -12,8 +12,7 @@ window.PROFILE = {
   languages: ['French (native)', 'English (professional)', 'Spanish (professional)', 'German (working)', 'Italian (working)'],
   links: [
     { label: 'LinkedIn', url: 'https://www.linkedin.com/in/pascal-guilcher/' },
-    { label: 'GitHub', url: 'https://github.com/pgu' },
-    { label: 'Stack Overflow', url: 'http://careers.stackoverflow.com/pgu' }
+    { label: 'GitHub', url: 'https://github.com/pgu' }
   ],
   careerStart: 2005
 };
