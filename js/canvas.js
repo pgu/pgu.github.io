@@ -10,6 +10,7 @@
   var FLAG_URL = 'chrome://flags/#canvas-draw-element';
   var CARD_W = 160, CARD_H = 100;
   var PAD = 20, MAG = 1.3, SIGMA = 1.1, DOCK_H = 215;
+  var OPEN_S = .8, CLOSE_S = .55, GENIE_STRIPS = 140, GENIE_LAG = .2;
 
   var LABELS = {
     'qlik-design': ['Qlik', 'Product Designer', 140], 'qlik-swe': ['Qlik', 'Principal Engineer', 140],
@@ -27,6 +28,7 @@
   var mouse = null;           // {x, y} in canvas CSS px, or null
   var sel = -1, morphIdx = -1, morphT = 0, morphTarget = 0;
   var shiftCur = 0, mxCur = 0, last = 0;
+  var snap, snapCtx, snapDirty = true;   // bitmap copy of the detail panel, so genie strips are cheap drawImage calls
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function el(tag, cls, text) {
@@ -196,6 +198,9 @@
     slot = avail / (items.length + 2.6);   // spare room for the dock to widen under the cursor
     rest0 = PAD + (avail - items.length * slot) / 2;
     items.forEach(function (it, i) { it.rc = rest0 + (i + .5) * slot; });
+    snap = snap || document.createElement('canvas');
+    snap.width = Math.round((W - 2 * PAD) * dpr); snap.height = Math.round((H - PAD - DOCK_H) * dpr);
+    snapCtx = snap.getContext('2d'); snapDirty = true;
     detailEl.style.width = (W - 2 * PAD) + 'px';
     detailEl.style.height = (H - PAD - DOCK_H) + 'px';
     cv.requestPaint();
@@ -206,6 +211,7 @@
     if (i >= 0) {
       morphIdx = i; morphT = reduced ? 1 : 0; morphTarget = 1;
       buildDetail(items[i].job, items[i].hue);
+      snapDirty = true;
     } else morphTarget = 0;
     cv.requestPaint();
   }
@@ -228,7 +234,6 @@
   }
 
   /* ---------- paint ---------- */
-  function ease(t) { return 1 - Math.pow(1 - t, 3); }
   function smooth(a, b, t) { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); }
   function roundRect(x, y, w, h, r) {
     ctx.beginPath(); ctx.moveTo(x + r, y);
@@ -236,8 +241,30 @@
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   }
 
-  function paint() {
+  function easeInOut(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  // macOS-style genie: slice the panel bitmap (snap) into horizontal strips.
+  // Strip s (0 = top .. 1 = bottom) starts moving after a delay proportional to s, so the top
+  // leaves the icon first and the bottom stays pinched to it, giving the funnel / S-curve.
+  function genie(p, icon, dest) {
+    var N = GENIE_STRIPS;
+    function U(sv) { return easeInOut(Math.min(1, Math.max(0, p * (1 + GENIE_LAG) - GENIE_LAG * sv))); }
+    function Y(sv) { return lerp(icon.top + sv * icon.h, dest.y + sv * dest.h, U(sv)); }
+    for (var k = 0; k < N; k++) {
+      var s0 = k / N, s1 = (k + 1) / N, sm = (s0 + s1) / 2;
+      var u = U(sm), wf = u * u * (3 - 2 * u);
+      var w = lerp(icon.w, dest.w, wf), cxs = lerp(icon.cx, dest.x + dest.w / 2, wf);
+      var y0 = Y(s0), y1 = Y(s1);
+      var sh = snap.height / N;
+      ctx.drawImage(snap, 0, k * sh, snap.width, sh, cxs - w / 2, y0, w, Math.max(.5, y1 - y0) + .75);
+    }
+  }
+
+  function paint(e) {
     if (failed) return;
+    // Re-snapshot the panel whenever the browser says its rendering changed (content, resize).
+    if (!e || !e.changedElements || Array.prototype.indexOf.call(e.changedElements, detailEl) >= 0) snapDirty = true;
     try { draw(); } catch (err) { failed = true; showFallback(err && err.message || err); }
   }
 
@@ -277,6 +304,15 @@
     shiftCur += (shiftT - shiftCur) * k;
     if (Math.abs(shiftT - shiftCur) > .3) busy = true;
 
+    var mainRect = { x: PAD, y: PAD, w: W - 2 * PAD, h: H - PAD - DOCK_H };
+    if (snapDirty && morphIdx >= 0 && morphT < 1) {
+      // one full-size draw of the live element at the canvas origin, copied out before the background paints over it
+      ctx.drawElementImage(detailEl, 0, 0, mainRect.w, mainRect.h);
+      snapCtx.clearRect(0, 0, snap.width, snap.height);
+      snapCtx.drawImage(cv, 0, 0, snap.width, snap.height, 0, 0, snap.width, snap.height);
+      snapDirty = false;
+    }
+
     // background: faint grid + ghost year
     ctx.fillStyle = '#0a1226'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = 'rgba(56,189,248,.05)'; ctx.lineWidth = 1;
@@ -303,7 +339,6 @@
     ctx.beginPath(); ctx.moveTo(PAD, axisY); ctx.lineTo(W - PAD, axisY); ctx.stroke();
 
     // cards + dots
-    var mainRect = { x: PAD, y: PAD, w: W - 2 * PAD, h: H - PAD - DOCK_H };
     items.forEach(function (it, i) {
       var x = cx[i] + shiftCur;
       var dw = it.f * slot * .88, s = dw / CARD_W, dh = CARD_H * s;
@@ -319,7 +354,7 @@
       if (i === sel) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, axisY, 9, 0, 7); ctx.stroke(); }
 
       // card
-      var alpha = i === morphIdx ? 1 - smooth(0, .6, morphT) : 1;
+      var alpha = i === morphIdx ? 1 - smooth(0, .15, morphT) : 1;
       if (alpha > .01) {
         // explicit destination size: the snapshot is device-pixel sized, so don't rely on ctx scale
         ctx.save(); ctx.globalAlpha = alpha;
@@ -328,29 +363,33 @@
       }
     });
 
-    // expanding detail panel
+    // expanding detail panel ("genie": the panel is drawn as horizontal strips that funnel into the dock card)
     var live = false;
     if (morphIdx >= 0) {
       var tgt = morphTarget;
-      morphT += (tgt - morphT) * (reduced ? 1 : 1 - Math.exp(-dt * 9));
-      if (Math.abs(tgt - morphT) < .004) morphT = tgt; else busy = true;
+      if (reduced) morphT = tgt;
+      else morphT += Math.sign(tgt - morphT) * dt / (tgt ? OPEN_S : CLOSE_S);
+      if ((tgt - morphT) * (tgt ? 1 : -1) <= 0) morphT = tgt; else busy = true;
       if (morphT === 0 && tgt === 0) morphIdx = -1;
     }
     if (morphIdx >= 0) {
-      var src = items[morphIdx].rect, e = ease(morphT);
-      var rx2 = src.x + (mainRect.x - src.x) * e, ry2 = src.y + (mainRect.y - src.y) * e;
-      var rw2 = src.w + (mainRect.w - src.w) * e, rh2 = (src.h - 30) + (mainRect.h - (src.h - 30)) * e;
+      var ic = items[morphIdx];
+      var iw = slot * .88, ih = CARD_H * iw / CARD_W;
+      var icon = { cx: cx[morphIdx] + shiftCur, w: iw, top: cardBottom - ih, h: ih };
       // beam from dot to panel
-      var bx = cx[morphIdx] + shiftCur;
-      ctx.strokeStyle = 'hsla(' + items[morphIdx].hue + ' 80% 60% / ' + (.5 * morphT) + ')'; ctx.lineWidth = 2; ctx.setLineDash([4, 6]);
-      ctx.beginPath(); ctx.moveTo(bx, axisY); ctx.lineTo(bx, ry2 + rh2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle = 'hsla(' + ic.hue + ' 80% 60% / ' + (.5 * smooth(.7, 1, morphT)) + ')'; ctx.lineWidth = 2; ctx.setLineDash([4, 6]);
+      ctx.beginPath(); ctx.moveTo(icon.cx, axisY); ctx.lineTo(icon.cx, mainRect.y + mainRect.h); ctx.stroke(); ctx.setLineDash([]);
 
       ctx.save();
-      ctx.globalAlpha = smooth(.15, .8, morphT);
-      var t = ctx.drawElementImage(detailEl, rx2, ry2, rw2, rh2);
+      ctx.globalAlpha = smooth(0, .1, morphT);
+      if (morphT < 1) {
+        genie(morphT, icon, mainRect);
+      } else {
+        var t = ctx.drawElementImage(detailEl, mainRect.x, mainRect.y, mainRect.w, mainRect.h);
+        // keep the live DOM (chips, close button) aligned with what is drawn, so clicks land
+        if (t && t.toString) detailEl.style.transform = t.toString();
+      }
       ctx.restore();
-      // keep the live DOM (chips, close button) aligned with what is drawn, so clicks land
-      if (t && t.toString) detailEl.style.transform = t.toString();
       live = morphT === 1 && morphTarget === 1;
     }
     detailEl.classList.toggle('live', live);
