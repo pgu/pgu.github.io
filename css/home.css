@@ -158,3 +158,28 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
   .tabs .tab-portfolio { margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .arena.hit { animation: none; } }
+
+/* ---- geo ---- */
+.geo-controls { display: flex; align-items: center; gap: 14px; margin: 8px 0 12px; }
+.geo-controls input[type=range] { flex: 1; accent-color: var(--accent); }
+.geo-controls output { min-width: 84px; text-align: right; font-family: var(--mono); color: var(--accent); }
+.geo-play { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); color: var(--text); cursor: pointer; font-size: 14px; }
+.geo-play:hover { border-color: var(--accent); }
+.geo-layout { display: grid; grid-template-columns: 1fr 340px; gap: 16px; }
+.geo-map { height: min(66vh, 600px); min-height: 380px; border: 1px solid var(--line); border-radius: 12px; background: #0d1730; z-index: 0; }
+.geo-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; max-height: min(66vh, 600px); overflow-y: auto; font-size: 14px; }
+.geo-panel h3 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.geo-panel h3:not(:first-child) { margin-top: 18px; }
+.geo-job { margin: 0 0 12px; }
+.geo-job b { display: block; }
+.geo-job .tl-when, .geo-job .tl-org { font-size: 13px; }
+.geo-job.edu b::before { content: "🎓 "; }
+.geo-empty { color: var(--muted); }
+.geo-note { color: var(--muted); font-size: 12px; }
+.leaflet-container { font-family: inherit; background: #0d1730; }
+.leaflet-container a { color: var(--accent); }
+.pin-active { animation: pulse 1.8s ease-out infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes pulse { 0% { stroke-opacity: .9; stroke-width: 2; } 100% { stroke-opacity: 0; stroke-width: 14; } }
+@media (max-width: 800px) { .geo-layout { grid-template-columns: 1fr; } .geo-panel { max-height: none; } }
+@media (prefers-reduced-motion: reduce) { .pin-active { animation: none; } }
+.geo-map .leaflet-tile-pane { filter: invert(1) hue-rotate(200deg) brightness(.85) contrast(.9) saturate(.6); }

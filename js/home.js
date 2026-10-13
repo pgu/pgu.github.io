@@ -215,7 +215,7 @@
   }
 
   /* ---------- routing ---------- */
-  var VIEWS = ['timeline', 'tech', 'game'];
+  var VIEWS = ['timeline', 'tech', 'geo', 'game'];
   function go(v) { if (location.hash !== '#' + v) location.hash = v; else route(); }
   function route() {
     var v = location.hash.replace('#', '');
@@ -226,6 +226,8 @@
     });
     window.dispatchEvent(new CustomEvent('viewchange', { detail: v }));
   }
+
+  window.App = { techChip: techChip, fmt: fmt, mIdx: mIdx, duration: duration, NOW_M: NOW_M, MONTHS: MONTHS };
 
   renderHero();
   renderTimeline();

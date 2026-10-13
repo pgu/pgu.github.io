@@ -68,7 +68,7 @@ window.CATEGORY_COLOR = {
 
 window.JOBS = [
   {
-    id: 'qlik-design', kind: 'work', org: 'Qlik', role: 'Principal Product Designer',
+    id: 'qlik-design', geo: ['nantes'], kind: 'work', org: 'Qlik', role: 'Principal Product Designer',
     start: [2025, 6], end: null, place: 'Nantes, France',
     blurb: 'Designing the user experience of Qlik\'s data integration and management software for data engineers and analysts, with Product Management, UX Research and Engineering.',
     points: [
@@ -80,7 +80,7 @@ window.JOBS = [
     tech: ['Figma', 'Miro', 'User research', 'Market intelligence', 'DataOps', 'FinOps', 'Semantic layer', 'MCP', 'AI agents', 'AI-assisted UX', 'Data catalog', 'Data quality']
   },
   {
-    id: 'qlik-swe', kind: 'work', org: 'Qlik', role: 'Principal Software Engineer',
+    id: 'qlik-swe', geo: ['nantes'], kind: 'work', org: 'Qlik', role: 'Principal Software Engineer',
     start: [2023, 5], end: [2025, 5], place: 'Nantes, France',
     blurb: 'Front-end engineer on API Designer, working closely with UX and Product.',
     points: [
@@ -91,7 +91,7 @@ window.JOBS = [
     tech: ['React.js', 'AngularJS', 'JavaScript', 'Figma', 'Miro', 'Pendo', 'User research', 'OpenAPI', 'Overlays', 'Arazzo', 'TypeSpec', 'REST', 'iPaaS', 'API management', 'Market intelligence', 'AI-assisted UX', 'Qlik Sense', 'Data quality', 'Data catalog']
   },
   {
-    id: 'talend', kind: 'work', org: 'Talend', role: 'Principal Software Engineer',
+    id: 'talend', geo: ['nantes'], kind: 'work', org: 'Talend', role: 'Principal Software Engineer',
     start: [2017, 11], end: [2023, 4], place: 'Nantes, France',
     blurb: 'Developer, UX/product designer, UX researcher and competitive-intelligence analyst across API products and data & integration projects. Talend was acquired by Qlik in 2023.',
     points: [
@@ -102,21 +102,21 @@ window.JOBS = [
     tech: ['React.js', 'AngularJS', 'JavaScript', 'Webpack', 'Jenkins', 'Git', 'GitHub', 'REST', 'OpenAPI', 'iPaaS', 'ELT', 'Reverse-ETL', 'Stitch', 'Data quality', 'User research', 'Market intelligence', 'Competitive analysis', 'Figma']
   },
   {
-    id: 'restlet', kind: 'work', org: 'Restlet', role: 'Full-Stack Web Engineer',
+    id: 'restlet', geo: ['nantes'], kind: 'work', org: 'Restlet', role: 'Full-Stack Web Engineer',
     start: [2014, 8], end: [2017, 10], place: 'Nantes area, France',
     blurb: 'ApiSpark: Studio (aka API Designer) and Client (aka API Tester, fka DHC). Acquired by Talend in 2017.',
     points: [],
     tech: ['AngularJS', 'Lodash', 'Moment.js', 'Select2', 'Bootstrap', 'CSS', 'Sass', 'Less', 'Git', 'GitHub', 'WebStorm', 'REST', 'Restlet', 'OpenAPI']
   },
   {
-    id: 'netco', kind: 'work', org: 'SFEIR @ netcosports', role: 'Front-End Web Developer',
+    id: 'netco', geo: ['paris'], kind: 'work', org: 'SFEIR @ netcosports', role: 'Front-End Web Developer',
     start: [2014, 3], end: [2014, 7], place: 'Paris region, France',
     blurb: 'Back-office web application letting customers manage their data (dev team: 1 senior developer).',
     points: [],
     tech: ['AngularJS', 'Lodash', 'Moment.js', 'Highcharts', 'Select2', 'Bootstrap', 'CSS', 'Stylus', 'Jade', 'Git', 'GitHub', 'IntelliJ IDEA']
   },
   {
-    id: 'adeo', kind: 'work', org: 'SFEIR @ adeo', role: 'Full-Stack Web Engineer',
+    id: 'adeo', geo: ['paris', 'lille'], kind: 'work', org: 'SFEIR @ adeo', role: 'Full-Stack Web Engineer',
     start: [2011, 11], end: [2014, 3], place: 'Neuilly-sur-Seine & Lille, France',
     blurb: 'CMS as a SaaS for the leading French player in the international DIY market (~12 senior developers).',
     points: [
@@ -127,52 +127,52 @@ window.JOBS = [
     tech: ['AngularJS', 'Underscore.js', 'JavaScript', 'CSS', 'GWT', 'Java', 'Guava', 'Restlet', 'Spring', 'JUnit', 'Mockito', 'Git', 'GitHub', 'Eclipse', 'IntelliJ IDEA', 'Agile', 'TDD', 'CloudBees', 'Android', 'Bash', 'REST']
   },
   {
-    id: 'storeforce', kind: 'work', org: 'SFEIR @ storeforce', role: 'Front-End & Backend Developer',
+    id: 'storeforce', geo: ['paris'], kind: 'work', org: 'SFEIR @ storeforce', role: 'Front-End & Backend Developer',
     start: [2011, 8], end: [2011, 10], place: 'Suresnes, France',
     blurb: 'SaaS store-management web app (team of 2), from persistence to UI: CRUD screens, a Google-Calendar-like planning UI, and the planning generation engine.',
     points: [],
     tech: ['GWT', 'CSS', 'GIN', 'Guava', 'Objectify', 'Google App Engine', 'Git', 'Maven', 'Jenkins', 'Agile']
   },
   {
-    id: 'altavia', kind: 'work', org: 'Altavia', role: 'Senior Software Development Engineer',
+    id: 'altavia', geo: ['paris'], kind: 'work', org: 'Altavia', role: 'Senior Software Development Engineer',
     start: [2010, 9], end: [2011, 7], place: 'Saint-Ouen, France',
     blurb: 'Web application for the mass retail sector (team of 4): CRUD screens, email and report engines, PDF/Excel import-export engines.',
     points: [],
     tech: ['GWT', 'Ajax', 'CSS', 'Java', 'GIN', 'Guice', 'Spring', 'iBatis', 'SQL', 'JUnit', 'Mockito', 'Apache POI', 'Quartz', 'iText', 'Guava', 'Bash', 'Tomcat', 'Eclipse', 'Maven', 'SVN', 'Hudson', 'Trac', 'Cygwin', 'Agile']
   },
   {
-    id: 'elca', kind: 'work', org: 'ELCA Informática', role: 'Full-Stack Web Developer',
+    id: 'elca', geo: ['madrid', 'lausanne'], kind: 'work', org: 'ELCA Informática', role: 'Full-Stack Web Developer',
     start: [2007, 10], end: [2010, 8], place: 'Madrid, Spain · Lausanne, Switzerland',
     blurb: 'Secutix2, a ticketing solution (team of ~50): CRUD and complex screens (rates grids), data import/export module, responsive UI components in object-oriented JavaScript.',
     points: [],
     tech: ['ExtJS', 'Ajax', 'HTML', 'CSS', 'JavaScript', 'JSON', 'JSP', 'Java', 'Spring', 'Hibernate', 'SQL', 'PL/SQL', 'Tomcat', 'Oracle', 'Eclipse', 'Maven', 'SVN', 'Hudson', 'Jira', 'Cygwin']
   },
   {
-    id: 'sopra', kind: 'work', org: 'Sopra Group', role: 'J2EE Java Engineer',
+    id: 'sopra', geo: ['madrid'], kind: 'work', org: 'Sopra Group', role: 'J2EE Java Engineer',
     start: [2006, 1], end: [2007, 9], place: 'Madrid, Spain',
     blurb: 'ANPE (French national employment agency, team of ~20): new features for candidates, employers and staff; build migration from Ant to Maven.',
     points: [],
     tech: ['JavaScript', 'Struts', 'Java EE', 'JSP', 'Servlets', 'EJB', 'JDBC', 'Java', 'Oracle', 'Eclipse', 'Ant', 'Maven', 'CVS', 'Cygwin']
   },
   {
-    id: '3m', kind: 'work', org: '3M', role: 'Marketing Intern',
+    id: '3m', geo: ['dusseldorf'], kind: 'work', org: '3M', role: 'Marketing Intern',
     start: [2005, 1], end: [2005, 4], place: 'Düsseldorf, Germany',
     blurb: 'Market research on ERP and best-of-breed players in Supply Chain Execution in Europe.',
     points: [],
     tech: ['Marketing research', 'Market intelligence', 'ERP', 'Supply chain']
   },
   {
-    id: 'ctu', kind: 'work', org: 'Czech Technical University', role: 'Development Intern',
+    id: 'ctu', geo: ['prague'], kind: 'work', org: 'Czech Technical University', role: 'Development Intern',
     start: [2004, 1], end: [2004, 6], place: 'Prague, Czechia',
     blurb: 'Researched and designed an interface between SVG and OWL.',
     points: [],
     tech: ['SVG', 'OWL']
   },
-  { id: 'edu-master', kind: 'edu', org: 'Université de Nantes · Universität Rostock', role: 'Master\'s degree, International Trade',
+  { id: 'edu-master', geo: ['nantes', 'rostock'], kind: 'edu', org: 'Université de Nantes · Universität Rostock', role: 'Master\'s degree, International Trade',
     start: [2004, 9], end: [2005, 12], place: 'Nantes · Rostock', blurb: '', points: [], tech: [] },
-  { id: 'edu-poly', kind: 'edu', org: 'Polytech\'Nantes', role: 'Engineer\'s degree, Software Engineering',
+  { id: 'edu-poly', geo: ['nantes'], kind: 'edu', org: 'Polytech\'Nantes', role: 'Engineer\'s degree, Software Engineering',
     start: [2001, 9], end: [2004, 6], place: 'Nantes, France', blurb: '', points: [], tech: [] },
-  { id: 'edu-prepa', kind: 'edu', org: 'Lycée Clemenceau', role: 'Prépa MP/MPSI',
+  { id: 'edu-prepa', geo: ['nantes'], kind: 'edu', org: 'Lycée Clemenceau', role: 'Prépa MP/MPSI',
     start: [1999, 9], end: [2001, 6], place: 'Nantes, France', blurb: '', points: [], tech: [] }
 ];
 
@@ -185,3 +185,15 @@ window.EXTRA_KEYWORDS = [
   'Environments', 'Magic Quadrant', 'Forrester Wave', 'MarketScape', 'Hype Cycle', 'Product Design',
   'Product Management', 'UX Research', 'Prototyping'
 ];
+
+// Places for the map view. `paris` groups the Paris-area sites (Neuilly-sur-Seine, Saint-Ouen, Suresnes).
+window.PLACES = {
+  nantes:     { name: 'Nantes', country: 'France', lat: 47.2184, lng: -1.5536 },
+  paris:      { name: 'Paris area', country: 'France', lat: 48.8700, lng: 2.3000 },
+  lille:      { name: 'Lille', country: 'France', lat: 50.6292, lng: 3.0573 },
+  madrid:     { name: 'Madrid', country: 'Spain', lat: 40.4168, lng: -3.7038 },
+  lausanne:   { name: 'Lausanne', country: 'Switzerland', lat: 46.5197, lng: 6.6323 },
+  prague:     { name: 'Prague', country: 'Czechia', lat: 50.0755, lng: 14.4378 },
+  dusseldorf: { name: 'Düsseldorf', country: 'Germany', lat: 51.2277, lng: 6.7735 },
+  rostock:    { name: 'Rostock', country: 'Germany', lat: 54.0924, lng: 12.0991 }
+};

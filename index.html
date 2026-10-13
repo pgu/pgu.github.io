@@ -26,6 +26,7 @@
   <nav class="tabs" role="tablist">
     <a href="#timeline" role="tab" data-view="timeline">Timeline</a>
     <a href="#tech" role="tab" data-view="tech">Tech map</a>
+    <a href="#geo" role="tab" data-view="geo">Map</a>
     <a href="#game" role="tab" data-view="game">Keyword rain</a>
   </nav>
 
@@ -42,6 +43,19 @@
       </div>
       <div class="tech-detail" id="tech-detail">Click a technology to see where and when it was used.</div>
       <div id="tech-map" class="tech-map"></div>
+    </section>
+
+    <section id="view-geo" class="view" hidden>
+      <div class="geo-controls">
+        <button id="geo-play" class="geo-play" aria-label="Play">▶</button>
+        <input type="range" id="geo-slider" min="0" max="0" step="1" value="0" aria-label="Date">
+        <output id="geo-date"></output>
+      </div>
+      <div class="geo-layout">
+        <div id="geo-map" class="geo-map"></div>
+        <aside id="geo-panel" class="geo-panel"></aside>
+      </div>
+      <p class="geo-note" id="geo-note"></p>
     </section>
 
     <section id="view-game" class="view" hidden>
@@ -83,6 +97,7 @@
 
   <script src="js/data.js"></script>
   <script src="js/home.js"></script>
+  <script src="js/geo.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>
