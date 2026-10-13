@@ -28,6 +28,7 @@
     <a href="#tech" role="tab" data-view="tech">Tech map</a>
     <a href="#geo" role="tab" data-view="geo">Map</a>
     <a href="#game" role="tab" data-view="game">Keyword rain</a>
+    <a href="#canvas" role="tab" data-view="canvas">Canvas timeline <span class="badge">experimental</span></a>
   </nav>
 
   <main>
@@ -88,6 +89,12 @@
         <p class="board-empty" id="g-empty">No games yet. Stored in this browser only.</p>
       </div>
     </section>
+
+    <section id="view-canvas" class="view" hidden>
+      <div id="cv-fallback" class="cv-fallback" hidden></div>
+      <div id="cv-stage" class="cv-stage" hidden></div>
+      <p class="geo-note" id="cv-note"></p>
+    </section>
   </main>
 
   <footer>
@@ -99,5 +106,6 @@
   <script src="js/home.js"></script>
   <script src="js/geo.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/canvas.js"></script>
 </body>
 </html>

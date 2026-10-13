@@ -1,0 +1,386 @@
+// Experimental timeline built on the HTML-in-Canvas proposal (WICG/html-in-canvas):
+// real DOM cards are children of a <canvas layoutsubtree>, laid out by the browser,
+// then painted into the canvas with ctx.drawElementImage() under custom transforms.
+(function () {
+  var A = window.App, JOBS = window.JOBS;
+  var fallbackEl = document.getElementById('cv-fallback');
+  var stage = document.getElementById('cv-stage');
+  var note = document.getElementById('cv-note');
+
+  var FLAG_URL = 'chrome://flags/#canvas-draw-element';
+  var CARD_W = 160, CARD_H = 100;
+  var PAD = 20, MAG = 1.3, SIGMA = 1.1, DOCK_H = 215;
+
+  var LABELS = {
+    'qlik-design': ['Qlik', 'Product Designer', 140], 'qlik-swe': ['Qlik', 'Principal Engineer', 140],
+    'talend': ['Talend', 'Principal Engineer', 5], 'restlet': ['Restlet', 'Full-Stack Engineer', 210],
+    'netco': ['netco', 'Front-End Developer', 30], 'adeo': ['adeo', 'Full-Stack Engineer', 30],
+    'storeforce': ['storeforce', 'Developer', 30], 'altavia': ['Altavia', 'Senior Engineer', 185],
+    'elca': ['ELCA', 'Full-Stack Developer', 255], 'sopra': ['Sopra', 'J2EE Engineer', 330],
+    '3m': ['3M', 'Marketing Intern', 355], 'ctu': ['CTU', 'Development Intern', 220],
+    'edu-master': ['Master', 'International Trade', 285], 'edu-poly': ['Polytech', 'Engineer\'s degree', 285],
+    'edu-prepa': ['Prépa', 'MP/MPSI', 285]
+  };
+
+  var started = false, failed = false;
+  var cv, ctx, items, detailEl, W, H, dpr = 1, slot, rest0;
+  var mouse = null;           // {x, y} in canvas CSS px, or null
+  var sel = -1, morphIdx = -1, morphT = 0, morphTarget = 0;
+  var shiftCur = 0, mxCur = 0, last = 0;
+  var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  /* ---------- support detection + fallback ---------- */
+  function hasApi() {
+    return typeof CanvasRenderingContext2D !== 'undefined' &&
+      typeof CanvasRenderingContext2D.prototype.drawElementImage === 'function' &&
+      'requestPaint' in HTMLCanvasElement.prototype;
+  }
+
+  function browser() {
+    var ua = navigator.userAgent, m;
+    if (/Firefox\//.test(ua)) return { name: 'Firefox', chromium: false };
+    if (/Chrom(e|ium)\//.test(ua)) {
+      m = ua.match(/Chrom(?:e|ium)\/(\d+)/);
+      var brand = /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera' : 'Chrome';
+      return { name: brand, chromium: true, version: m ? +m[1] : 0 };
+    }
+    if (/Safari\//.test(ua)) return { name: 'Safari', chromium: false };
+    return { name: 'this browser', chromium: false };
+  }
+
+  function showFallback(err) {
+    stage.hidden = true;
+    note.textContent = '';
+    fallbackEl.hidden = false;
+    fallbackEl.textContent = '';
+    var b = browser();
+    fallbackEl.appendChild(el('h2', null, 'This view needs HTML-in-Canvas'));
+
+    if (err) {
+      fallbackEl.appendChild(el('p', null, 'The API is present in ' + b.name + ' but failed while drawing:'));
+      fallbackEl.appendChild(el('p', 'cv-err', String(err)));
+      fallbackEl.appendChild(el('p', null, 'The proposal is still changing between Chrome versions, so this may need an update on my side.'));
+    } else if (!b.chromium) {
+      fallbackEl.appendChild(el('p', null,
+        b.name + ' does not implement HTML-in-Canvas (it is a WICG proposal, so far only prototyped in Chromium). ' +
+        'Open this page in Chrome, Edge or Brave to see it.'));
+    } else {
+      fallbackEl.appendChild(el('p', null,
+        b.name + ' ' + (b.version || '') + ' is Chromium-based, but the feature is switched off. To enable it:'));
+      var ol = el('ol');
+      var li1 = el('li'); li1.appendChild(document.createTextNode('Use Chrome 147 or newer (Canary works too) — you have ' + (b.version || 'an unknown version') + '.'));
+      var li2 = el('li'); li2.appendChild(document.createTextNode('Open '));
+      li2.appendChild(el('code', null, FLAG_URL));
+      var cp = el('button', null, 'Copy');
+      cp.addEventListener('click', function () {
+        if (navigator.clipboard) navigator.clipboard.writeText(FLAG_URL).then(function () { cp.textContent = 'Copied'; });
+      });
+      li2.appendChild(cp);
+      li2.appendChild(document.createTextNode(' in a new tab (browsers block links to chrome:// pages).'));
+      var li3 = el('li', null, 'Set “Enable the new drawElement API for Canvas” to Enabled.');
+      var li4 = el('li', null, 'Click Relaunch, then come back to this page and re-open this tab.');
+      [li1, li2, li3, li4].forEach(function (l) { ol.appendChild(l); });
+      fallbackEl.appendChild(ol);
+    }
+    var p = el('p');
+    p.appendChild(document.createTextNode('Meanwhile: '));
+    var a = el('a', null, 'regular timeline'); a.href = '#timeline';
+    p.appendChild(a);
+    p.appendChild(document.createTextNode(' · '));
+    var spec = el('a', null, 'about the proposal'); spec.href = 'https://github.com/WICG/html-in-canvas'; spec.target = '_blank'; spec.rel = 'noopener';
+    p.appendChild(spec);
+    fallbackEl.appendChild(p);
+  }
+
+  /* ---------- build ---------- */
+  function yearsLabel(j) {
+    return j.start[0] + ' – ' + (j.end ? String(j.end[0]).slice(-2) : 'now');
+  }
+
+  function buildDetail(j, hue) {
+    detailEl.textContent = '';
+    detailEl.style.setProperty('--h', hue);
+    var close = el('button', 'cv-close', 'Close ✕');
+    close.addEventListener('click', function () { select(-1); });
+    detailEl.appendChild(close);
+    detailEl.appendChild(el('h2', null, j.role));
+    detailEl.appendChild(el('div', 'tl-org', j.org));
+    detailEl.appendChild(el('div', 'tl-when', A.fmt(j.start) + ' – ' + A.fmt(j.end) + ' · ' + A.duration(j)));
+    detailEl.appendChild(el('div', 'tl-place', j.place));
+    if (j.blurb) detailEl.appendChild(el('p', 'tl-blurb', j.blurb));
+    if (j.points.length) {
+      var ul = el('ul', 'tl-points');
+      j.points.forEach(function (t) { ul.appendChild(el('li', null, t)); });
+      detailEl.appendChild(ul);
+    }
+    if (j.tech.length) {
+      var tt = el('div', 'tl-tech');
+      j.tech.forEach(function (t) { tt.appendChild(A.techChip(t)); });
+      detailEl.appendChild(tt);
+    }
+  }
+
+  function start() {
+    started = true;
+    cv = document.createElement('canvas');
+    cv.setAttribute('layoutsubtree', '');          // current Chromium spelling
+    cv.setAttribute('content', 'drawable');        // spelling in the newest spec draft; harmless if unknown
+    cv.tabIndex = 0;
+    cv.setAttribute('aria-label', 'Career timeline. Use left and right arrows to browse, Enter to expand, Escape to close.');
+    ctx = cv.getContext('2d');
+
+    var sorted = JOBS.slice().sort(function (a, b) { return A.mIdx(a.start) - A.mIdx(b.start); });
+    items = sorted.map(function (j) {
+      var lab = LABELS[j.id] || [j.org, j.role, 200];
+      var c = el('div', 'cv-card ' + j.kind);
+      c.style.setProperty('--h', lab[2]);
+      c.setAttribute('drawable', '');
+      c.appendChild(el('span', 'o', lab[0]));
+      c.appendChild(el('span', 's', lab[1]));
+      c.appendChild(el('span', 'y', yearsLabel(j)));
+      cv.appendChild(c);
+      return { job: j, hue: lab[2], el: c, f: 1, rc: 0, rect: null };
+    });
+    detailEl = el('div', 'cv-detail');
+    detailEl.setAttribute('drawable', '');
+    cv.appendChild(detailEl);
+
+    stage.appendChild(cv);
+    cv.addEventListener('paint', paint);
+    cv.addEventListener('pointermove', function (e) {
+      var r = cv.getBoundingClientRect();
+      mouse = { x: e.clientX - r.left, y: e.clientY - r.top };
+      cv.style.cursor = hit(mouse) >= 0 || detailButtonAt(e.clientX, e.clientY) ? 'pointer' : '';
+      cv.requestPaint();
+    });
+    cv.addEventListener('pointerleave', function () { mouse = null; cv.style.cursor = ''; cv.requestPaint(); });
+    cv.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('.cv-detail')) return;
+      // Chromium (155, flag) reports the <canvas> itself as the hit target even over drawn children,
+      // so route clicks to the detail panel's buttons by their (transform-synced) layout rects.
+      var btn = detailButtonAt(e.clientX, e.clientY);
+      if (btn) { btn.click(); return; }
+      var r = cv.getBoundingClientRect();
+      var i = hit({ x: e.clientX - r.left, y: e.clientY - r.top });
+      if (i < 0 && detailEl.classList.contains('live') && inRect(e.clientX, e.clientY, detailEl.getBoundingClientRect())) return;
+      select(i >= 0 && i !== sel ? i : -1);
+    });
+    cv.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') select(-1);
+      else if (e.key === 'ArrowRight') select(Math.min(items.length - 1, sel + 1));
+      else if (e.key === 'ArrowLeft') select(sel < 0 ? items.length - 1 : Math.max(0, sel - 1));
+      else if (e.key === 'Enter' && sel < 0) select(items.length - 1);
+      else return;
+      e.preventDefault();
+    });
+    new ResizeObserver(resize).observe(cv);
+    note.textContent = 'Experimental: every card is a live DOM element drawn into a <canvas> with drawElementImage(). ' +
+      'Hover the dock, click a card to expand it, ←/→ to browse, Esc to close.';
+    resize();
+  }
+
+  function resize() {
+    var r = cv.getBoundingClientRect();
+    if (!r.width) return;
+    dpr = window.devicePixelRatio || 1;
+    W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    var avail = W - 2 * PAD;
+    slot = avail / (items.length + 2.6);   // spare room for the dock to widen under the cursor
+    rest0 = PAD + (avail - items.length * slot) / 2;
+    items.forEach(function (it, i) { it.rc = rest0 + (i + .5) * slot; });
+    detailEl.style.width = (W - 2 * PAD) + 'px';
+    detailEl.style.height = (H - PAD - DOCK_H) + 'px';
+    cv.requestPaint();
+  }
+
+  function select(i) {
+    sel = i;
+    if (i >= 0) {
+      morphIdx = i; morphT = reduced ? 1 : 0; morphTarget = 1;
+      buildDetail(items[i].job, items[i].hue);
+    } else morphTarget = 0;
+    cv.requestPaint();
+  }
+
+  function inRect(x, y, r) { return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; }
+
+  function detailButtonAt(x, y) {
+    if (!detailEl || !detailEl.classList.contains('live')) return null;
+    var bs = detailEl.querySelectorAll('button');
+    for (var i = 0; i < bs.length; i++) if (inRect(x, y, bs[i].getBoundingClientRect())) return bs[i];
+    return null;
+  }
+
+  function hit(p) {
+    for (var i = items.length - 1; i >= 0; i--) {
+      var r = items[i].rect;
+      if (r && p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h) return i;
+    }
+    return -1;
+  }
+
+  /* ---------- paint ---------- */
+  function ease(t) { return 1 - Math.pow(1 - t, 3); }
+  function smooth(a, b, t) { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t); }
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+
+  function paint() {
+    if (failed) return;
+    try { draw(); } catch (err) { failed = true; showFallback(err && err.message || err); }
+  }
+
+  function draw() {
+    var now = performance.now();
+    var dt = last ? Math.min(.05, (now - last) / 1000) : .016;
+    last = now;
+    var k = reduced ? 1 : 1 - Math.exp(-dt * 14);
+    var busy = false;
+
+    ctx.reset();
+    ctx.scale(dpr, dpr);
+
+    var axisY = H - 62, cardBottom = axisY - 16;
+    var inDock = mouse && mouse.y > H - DOCK_H;
+
+    // magnification targets (macOS-dock style gaussian around the cursor)
+    var fmax = Math.min(1 + MAG, 1.1 * CARD_W / (slot * .88));
+    items.forEach(function (it, i) {
+      var d = inDock ? (mouse.x - it.rc) / (slot * SIGMA) : 99;
+      var target = 1 + (fmax - 1) * Math.exp(-d * d);
+      if (i === sel) target = Math.max(target, 1);
+      it.f += (target - it.f) * k;
+      if (Math.abs(target - it.f) > .003) busy = true;
+    });
+
+    // widths -> positions, then pin the point under the cursor so the dock grows around it
+    var cx = [], acc = rest0;
+    items.forEach(function (it, i) { var w = it.f * slot; cx[i] = acc + w / 2; acc += w; });
+    var shiftT = 0;
+    if (inDock) {
+      var mx = Math.min(items[items.length - 1].rc, Math.max(items[0].rc, mouse.x)), i0 = 0;
+      while (i0 < items.length - 2 && items[i0 + 1].rc < mx) i0++;
+      var u = (mx - items[i0].rc) / slot;
+      shiftT = mx - (cx[i0] + u * (cx[i0 + 1] - cx[i0]));
+    }
+    shiftCur += (shiftT - shiftCur) * k;
+    if (Math.abs(shiftT - shiftCur) > .3) busy = true;
+
+    // background: faint grid + ghost year
+    ctx.fillStyle = '#0a1226'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(56,189,248,.05)'; ctx.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 40) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+    for (var gy = 0; gy < H; gy += 40) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+
+    var focus = hit_idx(inDock);
+    var ghost = items[morphT > .5 && morphIdx >= 0 ? morphIdx : (focus >= 0 ? focus : items.length - 1)];
+    ctx.fillStyle = 'rgba(148,163,184,.07)';
+    ctx.font = '800 200px -apple-system, "Segoe UI", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(ghost.job.start[0]), W / 2, (H - DOCK_H) / 2 + PAD);
+
+    if (morphIdx < 0 || morphT < .05) {
+      ctx.fillStyle = 'rgba(141,155,184,.8)'; ctx.font = '15px -apple-system, "Segoe UI", sans-serif';
+      ctx.fillText('Hover the dock, click a card to expand it', W / 2, (H - DOCK_H) / 2 + PAD + 130);
+    }
+
+    // axis
+    var g = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
+    g.addColorStop(0, 'rgba(56,189,248,0)'); g.addColorStop(.1, 'rgba(56,189,248,.7)');
+    g.addColorStop(.9, 'rgba(56,189,248,.7)'); g.addColorStop(1, 'rgba(56,189,248,0)');
+    ctx.strokeStyle = g; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(PAD, axisY); ctx.lineTo(W - PAD, axisY); ctx.stroke();
+
+    // cards + dots
+    var mainRect = { x: PAD, y: PAD, w: W - 2 * PAD, h: H - PAD - DOCK_H };
+    items.forEach(function (it, i) {
+      var x = cx[i] + shiftCur;
+      var dw = it.f * slot * .88, s = dw / CARD_W, dh = CARD_H * s;
+      var rx = x - dw / 2, ry = cardBottom - dh;
+      it.rect = { x: rx, y: ry, w: dw, h: dh + 30 };
+
+      // dot
+      var hot = i === sel || i === focus;
+      ctx.fillStyle = 'hsl(' + it.hue + ' 70% 62%)';
+      if (hot) { ctx.shadowColor = 'hsl(' + it.hue + ' 80% 60%)'; ctx.shadowBlur = 16; }
+      ctx.beginPath(); ctx.arc(x, axisY, hot ? 6 : 4, 0, 7); ctx.fill();
+      ctx.shadowBlur = 0;
+      if (i === sel) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, axisY, 9, 0, 7); ctx.stroke(); }
+
+      // card
+      var alpha = i === morphIdx ? 1 - smooth(0, .6, morphT) : 1;
+      if (alpha > .01) {
+        // explicit destination size: the snapshot is device-pixel sized, so don't rely on ctx scale
+        ctx.save(); ctx.globalAlpha = alpha;
+        ctx.drawElementImage(it.el, rx, ry, dw, dh);
+        ctx.restore();
+      }
+    });
+
+    // expanding detail panel
+    var live = false;
+    if (morphIdx >= 0) {
+      var tgt = morphTarget;
+      morphT += (tgt - morphT) * (reduced ? 1 : 1 - Math.exp(-dt * 9));
+      if (Math.abs(tgt - morphT) < .004) morphT = tgt; else busy = true;
+      if (morphT === 0 && tgt === 0) morphIdx = -1;
+    }
+    if (morphIdx >= 0) {
+      var src = items[morphIdx].rect, e = ease(morphT);
+      var rx2 = src.x + (mainRect.x - src.x) * e, ry2 = src.y + (mainRect.y - src.y) * e;
+      var rw2 = src.w + (mainRect.w - src.w) * e, rh2 = (src.h - 30) + (mainRect.h - (src.h - 30)) * e;
+      // beam from dot to panel
+      var bx = cx[morphIdx] + shiftCur;
+      ctx.strokeStyle = 'hsla(' + items[morphIdx].hue + ' 80% 60% / ' + (.5 * morphT) + ')'; ctx.lineWidth = 2; ctx.setLineDash([4, 6]);
+      ctx.beginPath(); ctx.moveTo(bx, axisY); ctx.lineTo(bx, ry2 + rh2); ctx.stroke(); ctx.setLineDash([]);
+
+      ctx.save();
+      ctx.globalAlpha = smooth(.15, .8, morphT);
+      var t = ctx.drawElementImage(detailEl, rx2, ry2, rw2, rh2);
+      ctx.restore();
+      // keep the live DOM (chips, close button) aligned with what is drawn, so clicks land
+      if (t && t.toString) detailEl.style.transform = t.toString();
+      live = morphT === 1 && morphTarget === 1;
+    }
+    detailEl.classList.toggle('live', live);
+
+    // year ticks under the dock
+    ctx.fillStyle = 'rgba(141,155,184,.9)'; ctx.font = '11px -apple-system, "Segoe UI", sans-serif';
+    ctx.textBaseline = 'top'; ctx.textAlign = 'center';
+    items.forEach(function (it, i) {
+      if (it.f > 1.15 || i === sel || i % 2 === 0)
+        ctx.fillText(it.job.start[0], cx[i] + shiftCur, axisY + 14);
+    });
+
+    if (busy) cv.requestPaint(); else last = 0;
+  }
+
+  function hit_idx(inDock) {
+    if (!inDock) return -1;
+    return hit(mouse);
+  }
+
+  /* ---------- wiring ---------- */
+  function show() {
+    if (failed) return;
+    if (!hasApi()) { showFallback(); return; }
+    fallbackEl.hidden = true;
+    stage.hidden = false;
+    if (!started) {
+      try { start(); } catch (err) { failed = true; showFallback(err && err.message || err); }
+    } else cv.requestPaint();
+  }
+  window.addEventListener('viewchange', function (e) { if (e.detail === 'canvas') show(); });
+  if (location.hash === '#canvas') show();
+})();

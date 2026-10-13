@@ -183,3 +183,36 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 @media (max-width: 800px) { .geo-layout { grid-template-columns: 1fr; } .geo-panel { max-height: none; } }
 @media (prefers-reduced-motion: reduce) { .pin-active { animation: none; } }
 .geo-map .leaflet-tile-pane { filter: invert(1) hue-rotate(200deg) brightness(.85) contrast(.9) saturate(.6); }
+
+/* ---- canvas timeline (HTML-in-Canvas, experimental) ---- */
+.badge { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 1px 6px; border-radius: 999px; border: 1px solid currentColor; vertical-align: 2px; opacity: .8; }
+.cv-fallback { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px; max-width: 760px; }
+.cv-fallback h2 { margin: 0 0 8px; font-size: 20px; }
+.cv-fallback ol { padding-left: 20px; }
+.cv-fallback li { margin-bottom: 6px; }
+.cv-fallback code { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; font-family: var(--mono); font-size: 13px; }
+.cv-fallback button { margin-left: 8px; background: none; border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 1px 8px; cursor: pointer; font-size: 12px; }
+.cv-fallback .cv-err { color: #fb7185; font-family: var(--mono); font-size: 13px; }
+.cv-stage canvas { position: relative; display: block; width: 100%; height: 580px; border: 1px solid var(--line); border-radius: 12px; background: #0a1226; outline: none; }
+.cv-stage canvas:focus-visible { border-color: var(--accent); }
+.cv-card, .cv-detail { position: absolute; left: 0; top: 0; pointer-events: none; box-sizing: border-box; }
+.cv-card {
+  width: 160px; height: 100px; padding: 10px 12px; border-radius: 12px; color: #fff; display: flex; flex-direction: column; justify-content: space-between;
+  background: linear-gradient(160deg, hsl(var(--h) 55% 34%), hsl(var(--h) 60% 18%)); border: 2px solid hsl(var(--h) 70% 62%);
+}
+.cv-card.edu { border-style: dashed; }
+.cv-card .o { font-size: 28px; font-weight: 800; line-height: 1.05; letter-spacing: -.02em; overflow: hidden; white-space: nowrap; }
+.cv-card .s { font-size: 13px; opacity: .85; line-height: 1.2; }
+.cv-card .y { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cv-detail {
+  padding: 22px 26px; border-radius: 16px; overflow: hidden; color: var(--text); font-size: 15px;
+  background: linear-gradient(160deg, hsl(var(--h) 40% 17%), #0e1730); border: 2px solid hsl(var(--h) 70% 58%);
+}
+.cv-detail.live { pointer-events: auto; }
+.cv-detail h2 { margin: 0; font-size: 26px; letter-spacing: -.02em; }
+.cv-detail .tl-org { font-size: 18px; }
+.cv-detail .tl-when, .cv-detail .tl-place { margin-top: 2px; }
+.cv-detail .tl-blurb { margin: 12px 0 6px; }
+.cv-detail .tl-points { display: block; }
+.cv-detail .tl-tech { margin-top: 10px; }
+.cv-detail .cv-close { position: absolute; top: 14px; right: 16px; background: none; border: 1px solid var(--line); color: var(--text); border-radius: 6px; padding: 2px 10px; cursor: pointer; }
