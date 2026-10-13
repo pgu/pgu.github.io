@@ -5,7 +5,8 @@
   var typedEl = document.getElementById('g-typed');
   var hud = {
     score: document.getElementById('g-score'), level: document.getElementById('g-level'),
-    lives: document.getElementById('g-lives'), best: document.getElementById('g-best')
+    lives: document.getElementById('g-lives'), best: document.getElementById('g-best'),
+    kpm: document.getElementById('g-kpm')
   };
   var CAT = window.TECH_CATEGORY, COLOR = window.CATEGORY_COLOR;
   var MAX_LIVES = 5;
@@ -26,15 +27,24 @@
     return out;
   })();
 
-  var best = 0;
-  try { best = +localStorage.getItem('pgu-keyword-best') || 0; } catch (e) {}
-  hud.best.textContent = best;
+  var HISTORY_KEY = 'pgu-keyword-history', HISTORY_MAX = 100;
+  var history = [];
+  try { history = JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch (e) {}
+  var best = history.reduce(function (m, r) { return Math.max(m, r.score); }, 0);
+
+  function saveHistory() {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch (e) {}
+  }
 
   var words, target, score, lives, level, killed, running, paused, last, spawnIn, raf;
+  var elapsed, keysOk, keysAll;
+
+  function kpm() { return elapsed >= 3 ? Math.round(keysOk / (elapsed / 60)) : 0; }
 
   function reset() {
     arena.querySelectorAll('.fw').forEach(function (n) { n.remove(); });
     words = []; target = null; score = 0; lives = MAX_LIVES; level = 1; killed = 0;
+    elapsed = 0; keysOk = 0; keysAll = 0;
     spawnIn = 0; typedEl.textContent = ' ';
     updateHud();
   }
@@ -44,6 +54,7 @@
     hud.level.textContent = level;
     hud.lives.textContent = new Array(lives + 1).join('♥') + new Array(MAX_LIVES - lives + 1).join('♡');
     hud.best.textContent = best;
+    hud.kpm.textContent = kpm();
   }
 
   function spawn() {
@@ -103,9 +114,11 @@
     if (paused) { last = ts; return; }
     var dt = Math.min(0.05, (ts - (last || ts)) / 1000);
     last = ts;
-    var speed = 38 + level * 9, h = arena.clientHeight;
+    var speed = 62 + level * 10, h = arena.clientHeight;
+    elapsed += dt;
     spawnIn -= dt;
-    if (spawnIn <= 0) { spawn(); spawnIn = Math.max(0.7, 2.4 - level * 0.18); }
+    if (spawnIn <= 0) { spawn(); spawnIn = Math.max(0.6, 2.0 - level * 0.16);
+      hud.kpm.textContent = kpm(); }
     for (var i = words.length - 1; i >= 0; i--) {
       var o = words[i];
       o.y += speed * dt;
@@ -125,14 +138,22 @@
   function gameOver() {
     running = false;
     cancelAnimationFrame(raf);
-    if (score > best) {
-      best = score;
-      try { localStorage.setItem('pgu-keyword-best', best); } catch (e) {}
-    }
+    var run = {
+      t: Date.now(), score: score, level: level, words: killed, kpm: kpm(),
+      acc: keysAll ? Math.round(keysOk / keysAll * 100) : 0, secs: Math.round(elapsed)
+    };
+    var prevBestKpm = history.reduce(function (m, r) { return Math.max(m, r.kpm); }, 0);
+    var newScore = score > best, newKpm = run.kpm > prevBestKpm;
+    history.unshift(run);
+    history = history.slice(0, HISTORY_MAX);
+    saveHistory();
+    best = Math.max(best, score);
     updateHud();
+    renderBoard();
     overlay.innerHTML = '';
     var h = document.createElement('h2'); h.textContent = 'Game over';
-    var p = document.createElement('p'); p.textContent = 'Score ' + score + ' · level ' + level + ' · ' + killed + ' keywords typed';
+    var p = document.createElement('p'); p.textContent = 'Score ' + score + ' · level ' + level + ' · ' + killed + ' keywords typed · ' + run.kpm + ' keys/min · ' + run.acc + '% accuracy' +
+      (newScore ? ' · new best score!' : '') + (newKpm ? ' · new best speed!' : '');
     overlay.appendChild(h); overlay.appendChild(p); overlay.appendChild(startBtn);
     startBtn.textContent = 'Play again';
     overlay.hidden = false;
@@ -160,6 +181,7 @@
     if (e.key.length !== 1) return;
     var k = e.key.toLowerCase();
     if (!/[a-z0-9]/.test(k)) return; // punctuation optional
+    keysAll++;
 
     if (!target) {
       // pick the lowest word starting with this letter
@@ -170,6 +192,7 @@
     } else if (target.key[target.progress] !== k) {
       return;
     }
+    keysOk++;
     target.progress++;
     paint(target);
     if (target.progress >= target.key.length) {
@@ -182,6 +205,50 @@
     }
   });
 
+  function fmtDate(t) {
+    var d = new Date(t);
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) + ' ' +
+      d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtTime(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  function cell(tr, text, cls) {
+    var td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; tr.appendChild(td);
+  }
+
+  function renderBoard() {
+    var rec = document.getElementById('g-records'), body = document.getElementById('g-history');
+    rec.textContent = ''; body.textContent = '';
+    document.getElementById('g-empty').hidden = history.length > 0;
+    document.querySelector('.history').hidden = history.length === 0;
+    document.getElementById('g-clear').hidden = history.length === 0;
+    if (!history.length) return;
+    function max(f) { return history.reduce(function (m, r) { return Math.max(m, r[f]); }, 0); }
+    var bs = max('score'), bk = max('kpm');
+    [['Best score', bs], ['Best keys/min', bk], ['Best level', max('level')], ['Games played', history.length]]
+      .forEach(function (r) {
+        var li = document.createElement('li');
+        var b = document.createElement('b'); b.textContent = r[1];
+        var s = document.createElement('span'); s.textContent = r[0];
+        li.appendChild(b); li.appendChild(s); rec.appendChild(li);
+      });
+    history.slice(0, 15).forEach(function (r) {
+      var tr = document.createElement('tr');
+      cell(tr, fmtDate(r.t));
+      cell(tr, r.score, r.score === bs ? 'best' : '');
+      cell(tr, r.level); cell(tr, r.words);
+      cell(tr, r.kpm, r.kpm === bk ? 'best' : '');
+      cell(tr, r.acc + '%'); cell(tr, fmtTime(r.secs));
+      body.appendChild(tr);
+    });
+  }
+
+  document.getElementById('g-clear').addEventListener('click', function () {
+    if (!confirm('Delete all game history stored in this browser?')) return;
+    history = []; best = 0; saveHistory(); renderBoard(); updateHud();
+  });
+
+  reset();
+  renderBoard();
   startBtn.addEventListener('click', start);
   window.addEventListener('viewchange', function (e) { if (e.detail !== 'game') pause(true); });
   window.addEventListener('blur', function () { pause(true); });

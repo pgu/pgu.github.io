@@ -136,6 +136,22 @@ footer { text-align: center; color: var(--muted); font-size: 13px; padding: 24px
 kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; font-family: var(--mono); font-size: 12px; }
 .game-typed { margin-top: 8px; height: 24px; text-align: center; font-family: var(--mono); color: var(--accent); }
 
+
+.board { margin-top: 28px; }
+.board-head { display: flex; justify-content: space-between; align-items: baseline; }
+.board h3 { margin: 0 0 10px; font-size: 16px; }
+.link-btn { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 13px; text-decoration: underline; }
+.records { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; padding: 0; margin: 0 0 16px; }
+.records li { flex: 1 1 130px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+.records b { display: block; font-size: 22px; font-family: var(--mono); }
+.records span { color: var(--muted); font-size: 13px; }
+.history { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.history th { text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); padding: 6px 8px; }
+.history td { padding: 6px 8px; border-bottom: 1px solid #1a2540; }
+.history td.best { color: #fbbf24; font-weight: 700; }
+.board-empty { color: var(--muted); font-size: 14px; }
+.history-wrap { overflow-x: auto; }
+
 @media (max-width: 640px) {
   .hero-inner { flex-direction: column; text-align: center; }
   .tm-axis, .tm-row { grid-template-columns: 96px 1fr; gap: 8px; }

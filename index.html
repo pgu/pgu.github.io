@@ -49,6 +49,7 @@
         <span>Score <b id="g-score">0</b></span>
         <span>Level <b id="g-level">1</b></span>
         <span>Lives <b id="g-lives">♥♥♥♥♥</b></span>
+        <span>Keys/min <b id="g-kpm">0</b></span>
         <span>Best <b id="g-best">0</b></span>
       </div>
       <div class="arena" id="arena">
@@ -60,6 +61,18 @@
         </div>
       </div>
       <div class="game-typed" id="g-typed">&nbsp;</div>
+      <div class="board">
+        <div class="board-head">
+          <h3>Records &amp; history</h3>
+          <button id="g-clear" class="link-btn">Clear history</button>
+        </div>
+        <ul class="records" id="g-records"></ul>
+        <table class="history">
+          <thead><tr><th>Date</th><th>Score</th><th>Level</th><th>Words</th><th>Keys/min</th><th>Accuracy</th><th>Time</th></tr></thead>
+          <tbody id="g-history"></tbody>
+        </table>
+        <p class="board-empty" id="g-empty">No games yet. Stored in this browser only.</p>
+      </div>
     </section>
   </main>
 
