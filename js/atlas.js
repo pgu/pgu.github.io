@@ -25,6 +25,13 @@
   function hasKids(id) { return byId[id].children.length > 0; }
   function pathTo(id) { var a = []; for (var x = id; x; x = parent[x]) a.unshift(x); return a; }
   function childOfAncestor(id, pid) { for (var x = id; x; x = parent[x]) if (parent[x] === pid) return x; return null; }
+  var imgCountCache = {};
+  function imageCount(id) {     // pictures attached to a node or anywhere below it
+    if (imgCountCache[id] != null) return imgCountCache[id];
+    var n = (byId[id].images || []).length;
+    byId[id].children.forEach(function (c) { n += imageCount(c.id); });
+    return (imgCountCache[id] = n);
+  }
   function inSubtree(id, rootId) { for (var x = id; x; x = parent[x]) if (x === rootId) return true; return false; }
 
   // Links between the children of `pid`, and links that leave that subtree.
@@ -52,7 +59,8 @@
     }
     if (N === 1) ring(ch, 0, .5, 0);
     else if (N === 2) ring(ch, .6, .3, Math.PI);          // side by side, leaving the hub readable between them
-    else if (N <= 6) ring(ch, .58, .34, -Math.PI / 2);
+    else if (byId[id].seq && N <= 9) ring(ch, .62, N >= 7 ? .185 : .22, -Math.PI / 2);   // ordered chain: one ring, room for arrows
+    else if (N <= 8) ring(ch, N <= 6 ? .58 : .64, N <= 6 ? .34 : .25, -Math.PI / 2);
     else {
       var m = Math.ceil(N * .62);
       ring(ch.slice(0, m), .7, .24, -Math.PI / 2);
@@ -107,7 +115,10 @@
     lab.style.maxWidth = (p.r * 1.65) + 'px';
     e.appendChild(lab);
     var ext = D.links.filter(function (l) { return inSubtree(l.a, n.id) !== inSubtree(l.b, n.id); }).length;
-    if (ext) e.appendChild(el('span', 'at-badge', '↔ ' + ext));
+    var pics = imageCount(n.id), bits = [];
+    if (ext) bits.push('↔ ' + ext);
+    if (pics) bits.push('🖼 ' + pics);
+    if (bits.length) e.appendChild(el('span', 'at-badge', bits.join('  ')));
     e.addEventListener('click', function () { onNode(n.id); });
     e.addEventListener('mouseenter', function () { showInfo(n.id); });
     e.addEventListener('mouseleave', function () { showInfo(null); });
@@ -135,9 +146,21 @@
       var t = svgEl('title', {}); t.textContent = k.l.label || ''; path.appendChild(t);
       svg.appendChild(path);
     });
+    if (byId[id].seq) {   // ordered chain: arrows from each item to the next
+      var defs = svgEl('defs', {}), mk = svgEl('marker', { id: 'at-arrow', viewBox: '0 0 10 10', refX: '9', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto' });
+      mk.appendChild(svgEl('path', { d: 'M0 0L10 5L0 10z', fill: 'rgba(197,206,224,.95)' }));
+      defs.appendChild(mk); svg.appendChild(defs);
+      for (var q = 0; q < N - 1; q++) {
+        var s0 = byItem[L[q].id], s1 = byItem[L[q + 1].id], dx = s1.x - s0.x, dy = s1.y - s0.y, dd = Math.hypot(dx, dy) || 1, ux = dx / dd, uy = dy / dd;
+        svg.appendChild(svgEl('path', {
+          d: 'M' + (s0.x + ux * (s0.r + 3)) + ' ' + (s0.y + uy * (s0.r + 3)) + ' L' + (s1.x - ux * (s1.r + 6)) + ' ' + (s1.y - uy * (s1.r + 6)),
+          class: 'at-seq', 'marker-end': 'url(#at-arrow)'
+        }));
+      }
+    }
     layer.appendChild(svg);
 
-    if (N >= 2 && N <= 6) {   // title of the level in the hole of the ring
+    if (N >= 2 && N <= 8) {   // title of the level in the hole of the ring
       var c = el('div', 'at-center');
       c.style.left = C.x + 'px'; c.style.top = C.y + 'px';
       c.appendChild(el('b', null, byId[id].title));
@@ -208,6 +231,7 @@
     if (!trans) return;
     cur = trans.t >= .5 ? trans.c : trans.p;
     trans = null;
+    selected = null;
     render(); updateUI();
     if (flashId) { flash(flashId); flashId = null; }
   }
@@ -296,8 +320,14 @@
   }
 
   document.addEventListener('keydown', function (e) {
-    if (location.hash !== '#atlas' || busy || animating) return;
+    if (location.hash !== '#atlas') return;
+    if (!lb.hidden) { if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); } return; }
+    if (busy || animating) return;
     if (e.key === 'Escape' || e.key === 'Backspace') { e.preventDefault(); zoomOut(); }
+  });
+  stage.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('.at-node, .at-center, .at-up-pill')) return;
+    if (selected) { selected = null; showInfo(null); }
   });
   outBtn.addEventListener('click', function () { if (!busy && !animating) zoomOut(); });
 
@@ -306,8 +336,15 @@
 
   function updateUI() {
     crumbsEl.textContent = '';
-    pathTo(cur).forEach(function (id, i, arr) {
-      if (i) crumbsEl.appendChild(el('span', 'at-sep', '›'));
+    var path = pathTo(cur), KEEP = 5, first = Math.max(0, path.length - KEEP);
+    if (first > 0) {   // deep path: fold the oldest ancestors into one "…" crumb (its tooltip lists them)
+      var fold = el('button', 'at-crumb', '…');
+      fold.title = path.slice(0, first).map(function (x) { return byId[x].title; }).join(' › ');
+      fold.addEventListener('click', function () { goTo(path[first - 1]); });
+      crumbsEl.appendChild(fold);
+    }
+    path.slice(first).forEach(function (id, i) {
+      if (i || first > 0) crumbsEl.appendChild(el('span', 'at-sep', '›'));
       var b = el('button', 'at-crumb' + (id === cur ? ' on' : ''), byId[id].title);
       b.addEventListener('click', function () { if (id !== cur) goTo(id); });
       crumbsEl.appendChild(b);
@@ -346,6 +383,26 @@
     marker.style.top = (depth / maxDepth * 100) + '%';
   }
 
+  /* ---------- pictures: gallery in the side panel, click to enlarge ---------- */
+  var lb = el('div', 'at-lightbox'), lbImg = el('img'), lbCap = el('div', 'at-lb-cap');
+  lb.hidden = true; lb.appendChild(lbImg); lb.appendChild(lbCap); document.body.appendChild(lb);
+  function caption(im) { return im.title + (im.credit ? ' — ' + im.credit : ''); }
+  function openLightbox(im) { lbImg.src = im.src; lbImg.alt = im.title; lbCap.textContent = caption(im) + '   ·   click or Esc to close'; lb.hidden = false; }
+  function closeLightbox() { lb.hidden = true; lbImg.removeAttribute('src'); }
+  lb.addEventListener('click', closeLightbox);
+
+  function gallery(node) {
+    var gal = el('div', 'at-gallery');
+    node.images.forEach(function (im) {
+      var fig = el('figure', 'at-fig'), img = el('img');
+      img.src = im.src; img.alt = im.title; img.loading = 'lazy'; img.title = 'Click to enlarge';
+      img.addEventListener('click', function () { openLightbox(im); });
+      fig.appendChild(img); fig.appendChild(el('figcaption', null, caption(im)));
+      gal.appendChild(fig);
+    });
+    return gal;
+  }
+
   function linkRow(l, text, onGo, goLabel) {
     var row = el('div', 'at-link');
     row.appendChild(el('span', null, text));
@@ -363,8 +420,10 @@
     panelEl.appendChild(el('div', 'at-path', pathTo(nid).map(function (x) { return byId[x].title; }).join(' › ')));
     var credit = (nid === cur && !id && !selected && node.levelCredit) ? node.levelCredit : node.credit;
     if (credit) panelEl.appendChild(el('div', 'at-credit', 'Image: ' + credit));
-    var kids = node.children.length;
-    panelEl.appendChild(el('p', null, kids ? kids + ' item' + (kids > 1 ? 's' : '') + ' inside. Click to zoom in.' : 'Leaf. Pictures, text or animation can live here later.'));
+    var kids = node.children.length, hasImgs = node.images && node.images.length;
+    panelEl.appendChild(el('p', null, (kids ? kids + ' item' + (kids > 1 ? 's' : '') + ' inside. Click to zoom in.'
+      : hasImgs ? '' : 'Leaf. Text or animation can live here later.') + (hasImgs ? (kids ? ' ' : '') + 'Click a picture to enlarge it.' : '')));
+    if (hasImgs) panelEl.appendChild(gallery(node));
 
     var rel = D.links.map(function (l, i) { return { l: l, i: i }; }).filter(function (k) {
       var ia = inSubtree(k.l.a, nid), ib = inSubtree(k.l.b, nid);
