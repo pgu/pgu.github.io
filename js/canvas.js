@@ -24,7 +24,7 @@
   };
 
   var started = false, failed = false;
-  var cv, ctx, items, detailEl, W, H, dpr = 1, slot, rest0;
+  var cv, ctx, items, detailEl, bodyEl, W, H, dpr = 1, slot, rest0;
   var mouse = null;           // {x, y} in canvas CSS px, or null
   var sel = -1, morphIdx = -1, morphT = 0, morphTarget = 0;
   var shiftCur = 0, mxCur = 0, last = 0;
@@ -112,21 +112,34 @@
     var close = el('button', 'cv-close', 'Close ✕');
     close.addEventListener('click', function () { select(-1); });
     detailEl.appendChild(close);
-    detailEl.appendChild(el('h2', null, j.role));
-    detailEl.appendChild(el('div', 'tl-org', j.org));
-    detailEl.appendChild(el('div', 'tl-when', A.fmt(j.start) + ' – ' + A.fmt(j.end) + ' · ' + A.duration(j)));
-    detailEl.appendChild(el('div', 'tl-place', j.place));
-    if (j.blurb) detailEl.appendChild(el('p', 'tl-blurb', j.blurb));
+    // scrollable body: the Close button stays put while the content scrolls (wheel / Up / Down / PageUp / PageDown)
+    var body = bodyEl = el('div', 'cv-body');
+    detailEl.appendChild(body);
+    body.appendChild(el('h2', null, j.role));
+    body.appendChild(el('div', 'tl-org', j.org));
+    body.appendChild(el('div', 'tl-when', A.fmt(j.start) + ' – ' + A.fmt(j.end) + ' · ' + A.duration(j)));
+    body.appendChild(el('div', 'tl-place', j.place));
+    if (j.blurb) body.appendChild(el('p', 'tl-blurb', j.blurb));
     if (j.points.length) {
       var ul = el('ul', 'tl-points');
       j.points.forEach(function (t) { ul.appendChild(el('li', null, t)); });
-      detailEl.appendChild(ul);
+      body.appendChild(ul);
     }
     if (j.tech.length) {
       var tt = el('div', 'tl-tech');
       j.tech.forEach(function (t) { tt.appendChild(A.techChip(t)); });
-      detailEl.appendChild(tt);
+      body.appendChild(tt);
     }
+  }
+
+  // Scroll the panel body; returns true if it actually moved (so the page can scroll when it can't).
+  function scrollBody(dy) {
+    if (!bodyEl || !detailEl.classList.contains('live')) return false;
+    var before = bodyEl.scrollTop;
+    bodyEl.scrollTop = before + dy;
+    var moved = bodyEl.scrollTop !== before;
+    if (moved) cv.requestPaint();   // scrolling is a rendering change of the element: redraw
+    return moved;
   }
 
   function start() {
@@ -174,11 +187,18 @@
       if (i < 0 && detailEl.classList.contains('live') && inRect(e.clientX, e.clientY, detailEl.getBoundingClientRect())) return;
       select(i >= 0 && i !== sel ? i : -1);
     });
+    cv.addEventListener('wheel', function (e) {
+      if (!detailEl.classList.contains('live') || !inRect(e.clientX, e.clientY, detailEl.getBoundingClientRect())) return;
+      var dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * bodyEl.clientHeight : e.deltaY;
+      if (scrollBody(dy)) e.preventDefault();
+    }, { passive: false });
     cv.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') select(-1);
       else if (e.key === 'ArrowRight') select(Math.min(items.length - 1, sel + 1));
       else if (e.key === 'ArrowLeft') select(sel < 0 ? items.length - 1 : Math.max(0, sel - 1));
       else if (e.key === 'Enter' && sel < 0) select(items.length - 1);
+      else if (e.key === 'ArrowDown' || e.key === 'PageDown') { if (!scrollBody(e.key === 'PageDown' ? bodyEl.clientHeight * .9 : 48)) return; }
+      else if (e.key === 'ArrowUp' || e.key === 'PageUp') { if (!scrollBody(e.key === 'PageUp' ? -bodyEl.clientHeight * .9 : -48)) return; }
       else return;
       e.preventDefault();
     });
