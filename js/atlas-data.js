@@ -8,7 +8,7 @@
     return o;
   }
 
-  var root = n('me', 'Me', [
+  var me = n('me', 'Me', [
     n('customers', 'Customers understanding', [
       n('porter5', '5 Porter forces'),
       n('porter-chain', 'Porter value chain'),
@@ -57,6 +57,25 @@
       ])
     ], { hue: 28 })
   ], { hue: 265 });
+
+  // Cosmic levels above "Me": zooming out goes Me > Earth > Solar system > Milky Way.
+  var root = n('milky-way', 'Milky Way', [
+    n('solar-system', 'Solar system', [
+      n('earth', 'Earth', [me], {
+        hue: 205, pos: { x: .42, y: .18, r: .22 }, imageZoom: 1.22,
+        image: 'pictures/atlas/The_Earth_seen_from_Apollo_17.jpg',
+        credit: 'The Blue Marble, NASA / Apollo 17 crew (public domain)'
+      })
+    ], {
+      hue: 45, pos: { x: .36, y: .42, r: .13 },     // the Sun sits about halfway out in the Orion Spur, not at the centre
+      image: 'pictures/atlas/Solar_system.jpg',
+      credit: 'Solar System montage, NASA / JPL (public domain)'
+    })
+  ], {
+    hue: 230,
+    image: 'pictures/atlas/Milky_Way_2010.jpg',
+    credit: 'The Milky Way, artist\'s concept, NASA / JPL-Caltech / R. Hurt (SSC) (public domain)'
+  });
 
   // Placeholder cross-links: edit freely.
   var links = [

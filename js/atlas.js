@@ -58,6 +58,7 @@
       ring(ch.slice(0, m), .7, .24, -Math.PI / 2);
       ring(ch.slice(m), .24, .18, -Math.PI / 2);
     }
+    out.forEach(function (o) { var q = byId[o.id].pos; if (q) { o.x = q.x; o.y = q.y; o.r = q.r; } });   // hand-placed nodes (e.g. the Sun in the galaxy)
     return (layoutCache[id] = out);
   }
 
@@ -71,6 +72,11 @@
   function px(item) { return { x: C.x + R * item.x, y: C.y + R * item.y, r: R * item.r }; }
 
   /* ---------- DOM builders ---------- */
+  function setPicture(e, node) {
+    e.style.backgroundImage = 'url(' + node.image + ')';
+    if (node.imageZoom) e.style.backgroundSize = (node.imageZoom * 100) + '%';   // crop away black borders baked into the picture
+  }
+
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function svgEl(tag, attrs) { var e = document.createElementNS(SVG, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
 
@@ -81,11 +87,14 @@
     e.style.left = (p.x - p.r) + 'px'; e.style.top = (p.y - p.r) + 'px';
     e.style.width = e.style.height = (2 * p.r) + 'px';
     e.style.setProperty('--h', n.hue);
+    if (n.image) { e.classList.add('pic'); setPicture(e, n); }
+    if (p.r < 50) e.classList.add('tiny');     // too small for its label: the label goes underneath
     if (kids) {   // miniature of the next level, positioned exactly as that level will be
       layoutOf(n.id).forEach(function (ci) {
         var d = el('span', 'at-dot'), cr = p.r * ci.r;
         d.style.left = (p.r + p.r * ci.x - cr) + 'px'; d.style.top = (p.r + p.r * ci.y - cr) + 'px';
         d.style.width = d.style.height = (2 * cr) + 'px';
+        if (byId[ci.id].image) { d.classList.add('pic'); setPicture(d, byId[ci.id]); }
         e.appendChild(d);
       });
     }
@@ -107,6 +116,12 @@
     var L = layoutOf(id), N = L.length, byItem = {};
     L.forEach(function (it) { byItem[it.id] = px(it); });
 
+    if (byId[id].image) {   // the level's own picture: the same image the node showed one level up, so the zoom lands seamlessly
+      var bd = el('div', 'at-backdrop');
+      bd.style.left = (C.x - R) + 'px'; bd.style.top = (C.y - R) + 'px'; bd.style.width = bd.style.height = (2 * R) + 'px';
+      setPicture(bd, byId[id]);
+      layer.appendChild(bd);
+    }
     var svg = svgEl('svg', { width: W, height: H, class: 'at-edges' });
     linksAt(id).internal.forEach(function (k) {
       var a = byItem[k.a], b = byItem[k.b], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
@@ -118,7 +133,7 @@
     });
     layer.appendChild(svg);
 
-    if (N <= 6) {   // title of the level in the hole of the ring
+    if (N >= 2 && N <= 6) {   // title of the level in the hole of the ring
       var c = el('div', 'at-center');
       c.style.left = C.x + 'px'; c.style.top = C.y + 'px';
       c.appendChild(el('b', null, byId[id].title));
@@ -139,7 +154,8 @@
   var trans = null;            // { p, c, t }: camera between level p (t=0) and its child c (t=1)
   var layers = {};             // id -> layer element (only the ones in use)
   var raf = 0, animating = false, busy = false, settleTimer = 0, flashId = null, hoverId = null;
-  var built = false;
+  var built = false, introDone = false;
+  var START = 'me', INTRO = true;   // set INTRO = false to open directly on "Me"
 
   function setLayers(ids) {
     Object.keys(layers).forEach(function (k) {
@@ -221,14 +237,14 @@
   }
 
   // Navigate to the level of node `id` (its children are shown), one zoom step at a time.
-  function goTo(id, then) {
+  function goTo(id, then, dur) {
     if (busy || animating) return;
     busy = true;
     var from = pathTo(cur), to = pathTo(id), common = 0;
     while (common < from.length && common < to.length && from[common] === to[common]) common++;
     var seq = Promise.resolve(), i;
-    for (i = from.length; i > common; i--) seq = seq.then(function () { return zoomOut(340); });
-    to.slice(common).forEach(function (n) { seq = seq.then(function () { return zoomIn(n, 340); }); });
+    for (i = from.length; i > common; i--) seq = seq.then(function () { return zoomOut(dur || 340); });
+    to.slice(common).forEach(function (n) { seq = seq.then(function () { return zoomIn(n, dur || 340); }); });
     seq.then(function () { busy = false; if (then) then(); });
   }
 
@@ -341,6 +357,7 @@
     panelEl.appendChild(el('h3', null, id || selected ? 'Topic' : 'This level'));
     panelEl.appendChild(el('h2', null, node.title));
     panelEl.appendChild(el('div', 'at-path', pathTo(nid).map(function (x) { return byId[x].title; }).join(' › ')));
+    if (node.credit) panelEl.appendChild(el('div', 'at-credit', 'Image: ' + node.credit));
     var kids = node.children.length;
     panelEl.appendChild(el('p', null, kids ? kids + ' item' + (kids > 1 ? 's' : '') + ' inside. Click to zoom in.' : 'Leaf. Pictures, text or animation can live here later.'));
 
@@ -386,6 +403,16 @@
     if (!W) return;
     Object.keys(layers).forEach(function (k) { layers[k].remove(); });
     layers = {}; trans = null; built = true;
+    if (!introDone) {
+      introDone = true;
+      if (INTRO && !reduced) {     // powers-of-ten opening: start at the Milky Way and fly in to "Me"
+        cur = D.root.id;
+        render(); updateUI();
+        setTimeout(function () { goTo(START, null, 750); }, 500);
+        return;
+      }
+      cur = START;
+    }
     render(); updateUI();
   }
   new ResizeObserver(function () { if (stage.clientWidth && (stage.clientWidth !== W || stage.clientHeight !== H)) build(); }).observe(stage);

@@ -281,3 +281,13 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 .at-up-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 6; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   background: #0b1220cc; border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 3px 14px; font-size: 13px; cursor: pointer; }
 .at-up-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+.at-backdrop { position: absolute; border-radius: 50%; background-size: cover; background-position: center; opacity: .5; pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 72%); mask-image: radial-gradient(circle, #000 55%, transparent 72%); }
+.at-node.pic { background-size: cover; background-position: center; box-shadow: inset 0 0 0 100vmax rgba(5,10,25,.28); }
+.at-node.pic:hover { box-shadow: inset 0 0 0 100vmax rgba(5,10,25,.12), 0 0 0 4px hsl(var(--h) 80% 60% / .25), 0 0 24px hsl(var(--h) 80% 60% / .35); }
+.at-dot.pic { background-size: cover; background-position: center; border-color: rgba(255,255,255,.35); }
+.at-node.tiny { border-width: 1px; }
+.at-node.tiny .at-label { position: absolute; top: 100%; margin-top: 4px; max-width: none !important; white-space: nowrap; }
+.at-node.tiny .at-dot { display: none; }
+.at-credit { color: var(--muted); font-size: 11px; margin: 0 0 8px; }
