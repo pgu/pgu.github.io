@@ -172,7 +172,13 @@
             n('js-tooling', 'Tooling and build tools', [sq('nodejs', 'Node.js'), sq('webpack', 'Webpack')]),
             n('js-cicd', 'CI/CD', [sq('git-github', 'Git and GitHub', 'pull requests, reviews'), sq('jenkins-js', 'Jenkins')])
           ], { images: [pic('11-02-js.jpg', 'JavaScript explained', '© ByteByteGo')] }),
-          n('css-eco', 'CSS ecosystem', [sq('bootstrap', 'Bootstrap'), sq('tailwind', 'Tailwind'), sq('sass', 'Sass'), sq('design-tokens', 'Design tokens'), sq('design-system', 'Design system')])
+          n('css-eco', 'CSS ecosystem', [sq('bootstrap', 'Bootstrap'), sq('tailwind', 'Tailwind'), sq('sass', 'Sass'), sq('design-tokens', 'Design tokens'), sq('design-system', 'Design system')]),
+          n('frontend-perf', 'Frontend performance', [
+            sq('selective-rendering', 'Selective rendering'), sq('code-splitting', 'Code splitting', 'modular architecture'),
+            sq('loading-sequence', 'Loading sequence'), sq('priority-loading', 'Priority-based loading'),
+            sq('tree-shaking', 'Tree shaking'), sq('prefetching', 'Pre-fetching'),
+            sq('dynamic-imports', 'Dynamic imports'), sq('compression', 'Compression')
+          ], { images: [pic('11-05-frontend-perf.jpg', 'Frontend performance cheatsheet', '© ByteByteGo')] })
         ]),
 
         n('api-tech', 'API technologies', [
