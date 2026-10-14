@@ -273,3 +273,11 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 @media (max-width: 900px) { .at-layout { grid-template-columns: 1fr; } .at-panel { height: auto; max-height: 320px; } .at-ruler { display: none; } }
 .at-node.zoom-focus .at-label, .at-node.zoom-focus .at-badge { opacity: calc(1 - var(--t, 0) * 6); }
 .at-node.zoom-focus .at-dot { opacity: calc(1 - var(--t, 0) * 3); }
+
+.at-center.up { pointer-events: auto; cursor: pointer; padding: 10px 12px; border-radius: 14px; max-width: 130px; transition: background .15s; }
+.at-center.up:hover { background: #38bdf81f; }
+.at-center.up:hover .at-up-hint { color: var(--accent); }
+.at-up-hint { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.at-up-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 6; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: #0b1220cc; border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 3px 14px; font-size: 13px; cursor: pointer; }
+.at-up-pill:hover { border-color: var(--accent); color: var(--accent); }

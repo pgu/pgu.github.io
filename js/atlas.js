@@ -51,7 +51,8 @@
       });
     }
     if (N === 1) ring(ch, 0, .5, 0);
-    else if (N <= 6) ring(ch, N === 2 ? .5 : .58, .34, -Math.PI / 2);
+    else if (N === 2) ring(ch, .6, .3, Math.PI);          // side by side, leaving the hub readable between them
+    else if (N <= 6) ring(ch, .58, .34, -Math.PI / 2);
     else {
       var m = Math.ceil(N * .62);
       ring(ch.slice(0, m), .7, .24, -Math.PI / 2);
@@ -121,6 +122,12 @@
       var c = el('div', 'at-center');
       c.style.left = C.x + 'px'; c.style.top = C.y + 'px';
       c.appendChild(el('b', null, byId[id].title));
+      if (parent[id]) {   // the hub is also the way back up
+        c.classList.add('up');
+        c.appendChild(el('span', 'at-up-hint', '⤴ ' + byId[parent[id]].title));
+        c.title = 'Zoom out to ' + byId[parent[id]].title;
+        c.addEventListener('click', function () { if (!busy && !animating && !trans) zoomOut(); });
+      }
       layer.appendChild(c);
     }
     L.forEach(function (it) { layer.appendChild(buildNode(it)); });
@@ -286,8 +293,17 @@
       crumbsEl.appendChild(b);
     });
     outBtn.hidden = !parent[cur];
+    updateUpPill();
     buildRuler(); updateRuler();
     showInfo(null);
+  }
+
+  var upBtn = el('button', 'at-up-pill');
+  upBtn.addEventListener('click', function () { if (!busy && !animating && !trans) zoomOut(); });
+  stage.insertBefore(upBtn, rulerEl);
+  function updateUpPill() {
+    upBtn.hidden = !parent[cur];
+    if (parent[cur]) upBtn.textContent = '⤴ ' + byId[parent[cur]].title;
   }
 
   var marker;
