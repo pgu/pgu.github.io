@@ -222,3 +222,54 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 .cv-detail .cv-body::-webkit-scrollbar-track { background: transparent; }
 .cv-detail .cv-body::-webkit-scrollbar-thumb { background: hsl(var(--h) 40% 45% / .6); border-radius: 5px; border: 2px solid transparent; background-clip: padding-box; }
 .cv-detail .cv-close { right: 26px; z-index: 1; }
+
+/* ---- atlas (cosmic zoom) ---- */
+.at-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 8px 0 10px; min-height: 32px; }
+.at-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 14px; }
+.at-sep { color: var(--muted); }
+.at-crumb { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 2px 6px; border-radius: 6px; font: inherit; }
+.at-crumb:hover { background: var(--panel); color: var(--text); }
+.at-crumb.on { color: var(--accent); font-weight: 700; cursor: default; }
+.at-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+.at-stage {
+  position: relative; height: 600px; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; outline: none;
+  background: radial-gradient(circle at 50% 50%, #12203f 0%, #0a1226 70%); user-select: none;
+}
+.at-stage:focus-visible { border-color: var(--accent); }
+.at-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: 0 0; }
+.at-layer.moving { pointer-events: none; will-change: transform, opacity; }
+.at-edges { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.at-edge { fill: none; stroke: rgba(141,155,184,.55); stroke-width: 2; stroke-dasharray: 5 6; pointer-events: stroke; }
+.at-edge.hot { stroke: var(--accent); stroke-width: 4; stroke-dasharray: none; }
+.at-center { position: absolute; transform: translate(-50%, -50%); text-align: center; color: var(--muted); font-size: 13px; max-width: 120px; pointer-events: none; }
+.at-center b { color: var(--text); font-weight: 600; }
+.at-node {
+  position: absolute; border-radius: 50%; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, hsl(var(--h) 50% 26%), hsl(var(--h) 55% 12%)); border: 2px solid hsl(var(--h) 65% 52%);
+  transition: box-shadow .15s, border-color .15s;
+}
+.at-node.leaf { background: radial-gradient(circle at 35% 30%, hsl(var(--h) 55% 34%), hsl(var(--h) 55% 20%)); border-style: dashed; }
+.at-node:hover { box-shadow: 0 0 0 4px hsl(var(--h) 80% 60% / .25), 0 0 24px hsl(var(--h) 80% 60% / .35); border-color: hsl(var(--h) 85% 68%); }
+.at-node.flash { animation: at-flash 1.4s ease-out; }
+@keyframes at-flash { 0%, 40% { box-shadow: 0 0 0 6px #fff9, 0 0 40px hsl(var(--h) 90% 65%); } 100% { box-shadow: none; } }
+.at-label { position: relative; z-index: 1; text-align: center; line-height: 1.15; font-weight: 600; text-shadow: 0 1px 6px #000c; pointer-events: none; }
+.at-layer.moving .at-label { transition: none; }
+.at-dot { position: absolute; border-radius: 50%; background: hsl(var(--h) 60% 45% / .35); border: 1px solid hsl(var(--h) 70% 60% / .45); pointer-events: none; box-sizing: border-box; }
+.at-badge { position: absolute; bottom: 10%; z-index: 1; font-size: 11px; padding: 0 6px; border-radius: 999px; background: #0b1220cc; border: 1px solid var(--line); color: var(--muted); pointer-events: none; }
+.at-ruler { position: absolute; left: 12px; top: 28px; bottom: 28px; width: 150px; pointer-events: none; z-index: 5; border-left: 2px solid var(--line); }
+.at-tick { position: absolute; left: 0; transform: translateY(-50%); font-size: 11px; color: var(--muted); white-space: nowrap; display: flex; align-items: center; }
+.at-tick i { width: 10px; height: 2px; background: var(--line); margin-left: 0; margin-right: 6px; }
+.at-tick.known { color: #c5cee0; }
+.at-tick span { max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+.at-marker { position: absolute; left: -7px; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+.at-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; height: 600px; overflow-y: auto; font-size: 14px; }
+.at-panel h3 { margin: 14px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.at-panel h3:first-child { margin-top: 0; }
+.at-panel h2 { margin: 0 0 4px; font-size: 20px; letter-spacing: -.01em; }
+.at-path { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+.at-link { padding: 6px 0; border-bottom: 1px solid #1a2540; }
+.at-link em { display: block; color: var(--muted); font-size: 12px; font-style: normal; }
+.at-link .link-btn { color: var(--accent); }
+@media (max-width: 900px) { .at-layout { grid-template-columns: 1fr; } .at-panel { height: auto; max-height: 320px; } .at-ruler { display: none; } }
+.at-node.zoom-focus .at-label, .at-node.zoom-focus .at-badge { opacity: calc(1 - var(--t, 0) * 6); }
+.at-node.zoom-focus .at-dot { opacity: calc(1 - var(--t, 0) * 3); }
