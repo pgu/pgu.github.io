@@ -56,13 +56,21 @@
         ])
       ])
     ], { hue: 28 })
-  ], { hue: 265 });
+  ], {
+    hue: 265,
+    // one small pin among the city lights, in western France (Nantes), not the centre of the planet
+    pos: { x: -.565, y: -.5, r: .05 },
+    caption: 'one of ~8 billion'
+  });
 
   // Cosmic levels above "Me": zooming out goes Me > Earth > Solar system > Milky Way > Universe.
   var milkyWay = n('milky-way', 'Milky Way', [
     n('solar-system', 'Solar system', [
       n('earth', 'Earth', [me], {
         hue: 205, imageZoom: 1.22,
+        // inside the Earth level the backdrop is the planet at night: the city lights are everyone else
+        levelImage: 'pictures/atlas/Earth_at_night_globe.jpg', levelImageZoom: 1.2,
+        levelCredit: 'Earth at night (Africa, Europe and the Middle East), NASA Earth Observatory image by Robert Simmon, Suomi NPP VIIRS data courtesy of NOAA NGDC (public domain)',
         pos: { x: .06, y: -.56, r: .225 },      // sits exactly over the Earth in the Solar System montage (see imagePos below)
         image: 'pictures/atlas/The_Earth_seen_from_Apollo_17.jpg',
         credit: 'The Blue Marble, NASA / Apollo 17 crew (public domain)'

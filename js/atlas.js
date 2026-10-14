@@ -72,10 +72,12 @@
   function px(item) { return { x: C.x + R * item.x, y: C.y + R * item.y, r: R * item.r }; }
 
   /* ---------- DOM builders ---------- */
-  function setPicture(e, node) {
-    e.style.backgroundImage = 'url(' + node.image + ')';
-    if (node.imagePos) e.style.backgroundPosition = node.imagePos;
-    if (node.imageZoom) e.style.backgroundSize = (node.imageZoom * 100) + '%';   // crop away black borders baked into the picture
+  function setPicture(e, node, level) {
+    var img = level && node.levelImage ? node.levelImage : node.image;
+    var zoom = level && node.levelImage ? node.levelImageZoom : node.imageZoom;
+    e.style.backgroundImage = 'url(' + img + ')';
+    if (node.imagePos && !(level && node.levelImage)) e.style.backgroundPosition = node.imagePos;
+    if (zoom) e.style.backgroundSize = (zoom * 100) + '%';   // crop away black borders baked into the picture
   }
 
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
@@ -100,6 +102,7 @@
       });
     }
     var lab = el('span', 'at-label', n.title);
+    if (n.caption) lab.appendChild(el('small', 'at-caption', n.caption));
     lab.style.fontSize = Math.max(11, Math.min(21, p.r * .21)) + 'px';
     lab.style.maxWidth = (p.r * 1.65) + 'px';
     e.appendChild(lab);
@@ -117,10 +120,10 @@
     var L = layoutOf(id), N = L.length, byItem = {};
     L.forEach(function (it) { byItem[it.id] = px(it); });
 
-    if (byId[id].image) {   // the level's own picture: the same image the node showed one level up, so the zoom lands seamlessly
+    if (byId[id].image) {   // the level's own picture (a level can use a different one than its node, e.g. Earth by night): the same image the node showed one level up, so the zoom lands seamlessly
       var bd = el('div', 'at-backdrop');
       bd.style.left = (C.x - R) + 'px'; bd.style.top = (C.y - R) + 'px'; bd.style.width = bd.style.height = (2 * R) + 'px';
-      setPicture(bd, byId[id]);
+      setPicture(bd, byId[id], true);
       layer.appendChild(bd);
     }
     var svg = svgEl('svg', { width: W, height: H, class: 'at-edges' });
@@ -358,7 +361,8 @@
     panelEl.appendChild(el('h3', null, id || selected ? 'Topic' : 'This level'));
     panelEl.appendChild(el('h2', null, node.title));
     panelEl.appendChild(el('div', 'at-path', pathTo(nid).map(function (x) { return byId[x].title; }).join(' › ')));
-    if (node.credit) panelEl.appendChild(el('div', 'at-credit', 'Image: ' + node.credit));
+    var credit = (nid === cur && !id && !selected && node.levelCredit) ? node.levelCredit : node.credit;
+    if (credit) panelEl.appendChild(el('div', 'at-credit', 'Image: ' + credit));
     var kids = node.children.length;
     panelEl.appendChild(el('p', null, kids ? kids + ' item' + (kids > 1 ? 's' : '') + ' inside. Click to zoom in.' : 'Leaf. Pictures, text or animation can live here later.'));
 
