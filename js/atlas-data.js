@@ -9,7 +9,7 @@
   }
 
   var me = n('me', 'Me', [
-    n('customers', 'Customers understanding', [
+    n('customers', 'Understanding customers', [
       n('porter5', '5 Porter forces'),
       n('porter-chain', 'Porter value chain'),
       n('togaf', 'Enterprise architecture (TOGAF)', [
@@ -20,7 +20,7 @@
       ])
     ], { hue: 200 }),
 
-    n('market', 'Market understanding', [
+    n('market', 'Understanding the market', [
       n('data-cartography', 'Data management cartography'),
       n('competitors', 'Competitors products'),
       n('analysts', 'Analysts materials', [
