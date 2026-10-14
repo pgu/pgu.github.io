@@ -62,12 +62,13 @@
   var milkyWay = n('milky-way', 'Milky Way', [
     n('solar-system', 'Solar system', [
       n('earth', 'Earth', [me], {
-        hue: 205, pos: { x: .42, y: .18, r: .22 }, imageZoom: 1.22,
+        hue: 205, imageZoom: 1.22,
+        pos: { x: .06, y: -.56, r: .225 },      // sits exactly over the Earth in the Solar System montage (see imagePos below)
         image: 'pictures/atlas/The_Earth_seen_from_Apollo_17.jpg',
         credit: 'The Blue Marble, NASA / Apollo 17 crew (public domain)'
       })
     ], {
-      hue: 45, pos: { x: .36, y: .42, r: .13 },     // the Sun sits about halfway out in the Orion Spur, not at the centre
+      hue: 45, pos: { x: .36, y: .42, r: .13 }, imagePos: '50% 12%',     // the Sun sits about halfway out in the Orion Spur, not at the centre
       image: 'pictures/atlas/Solar_system.jpg',
       credit: 'Solar System montage, NASA / JPL (public domain)'
     })

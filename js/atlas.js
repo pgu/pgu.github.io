@@ -74,6 +74,7 @@
   /* ---------- DOM builders ---------- */
   function setPicture(e, node) {
     e.style.backgroundImage = 'url(' + node.image + ')';
+    if (node.imagePos) e.style.backgroundPosition = node.imagePos;
     if (node.imageZoom) e.style.backgroundSize = (node.imageZoom * 100) + '%';   // crop away black borders baked into the picture
   }
 
