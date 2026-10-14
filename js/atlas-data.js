@@ -58,8 +58,8 @@
     ], { hue: 28 })
   ], { hue: 265 });
 
-  // Cosmic levels above "Me": zooming out goes Me > Earth > Solar system > Milky Way.
-  var root = n('milky-way', 'Milky Way', [
+  // Cosmic levels above "Me": zooming out goes Me > Earth > Solar system > Milky Way > Universe.
+  var milkyWay = n('milky-way', 'Milky Way', [
     n('solar-system', 'Solar system', [
       n('earth', 'Earth', [me], {
         hue: 205, pos: { x: .42, y: .18, r: .22 }, imageZoom: 1.22,
@@ -72,7 +72,7 @@
       credit: 'Solar System montage, NASA / JPL (public domain)'
     })
   ], {
-    hue: 230,
+    hue: 230, pos: { x: -.28, y: -.3, r: .12 },     // one galaxy among countless others
     image: 'pictures/atlas/Milky_Way_2010.jpg',
     credit: 'The Milky Way, artist\'s concept, NASA / JPL-Caltech / R. Hurt (SSC) (public domain)'
   });
@@ -89,6 +89,13 @@
     { a: 'critical-capabilities', b: 'prioritization', label: 'capability gaps drive priorities' },
     { a: 'user-metrics', b: 'personas', label: 'who the users are' }
   ];
+
+  // The very top: deep space. One tiny patch of sky holds thousands of galaxies; ours is one of them.
+  var root = n('universe', 'Universe', [milkyWay], {
+    hue: 255,
+    image: 'pictures/atlas/The_Hubble_eXtreme_Deep_Field.jpg',
+    credit: 'Hubble eXtreme Deep Field, NASA / ESA / G. Illingworth, D. Magee, P. Oesch (UC Santa Cruz) / R. Bouwens (Leiden) / HUDF09 Team (public domain)'
+  });
 
   window.ATLAS = { root: root, links: links };
 })();
