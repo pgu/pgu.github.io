@@ -387,17 +387,29 @@
   var lb = el('div', 'at-lightbox'), lbImg = el('img'), lbCap = el('div', 'at-lb-cap');
   lb.hidden = true; lb.appendChild(lbImg); lb.appendChild(lbCap); document.body.appendChild(lb);
   function caption(im) { return im.title + (im.credit ? ' — ' + im.credit : ''); }
-  function openLightbox(im) { lbImg.src = im.src; lbImg.alt = im.title; lbCap.textContent = caption(im) + '   ·   click or Esc to close'; lb.hidden = false; }
+  // Restricted pictures are blurred unless the toggle is off (the choice is remembered in this browser).
+  var blurBox = document.getElementById('at-blur'), BLUR_KEY = 'pgu-atlas-blur';
+  try { if (localStorage.getItem(BLUR_KEY) === 'off') blurBox.checked = false; } catch (e) {}
+  function applyBlur() { document.body.classList.toggle('at-reveal', !blurBox.checked); }
+  blurBox.addEventListener('change', function () {
+    applyBlur();
+    try { localStorage.setItem(BLUR_KEY, blurBox.checked ? 'on' : 'off'); } catch (e) {}
+  });
+  applyBlur();
+
+  function openLightbox(im) { lb.classList.toggle('restricted', !!im.blur); lbImg.src = im.src; lbImg.alt = im.title; lbCap.textContent = caption(im) + '   ·   click or Esc to close'; lb.hidden = false; }
   function closeLightbox() { lb.hidden = true; lbImg.removeAttribute('src'); }
   lb.addEventListener('click', closeLightbox);
 
   function gallery(node) {
     var gal = el('div', 'at-gallery');
     node.images.forEach(function (im) {
-      var fig = el('figure', 'at-fig'), img = el('img');
+      var fig = el('figure', 'at-fig' + (im.blur ? ' restricted' : '')), img = el('img');
       img.src = im.src; img.alt = im.title; img.loading = 'lazy'; img.title = 'Click to enlarge';
       img.addEventListener('click', function () { openLightbox(im); });
-      fig.appendChild(img); fig.appendChild(el('figcaption', null, caption(im)));
+      fig.appendChild(img);
+      if (im.blur) fig.appendChild(el('span', 'at-blur-tag', 'Blurred: licensed content'));
+      fig.appendChild(el('figcaption', null, caption(im)));
       gal.appendChild(fig);
     });
     return gal;

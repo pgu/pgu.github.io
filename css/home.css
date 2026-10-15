@@ -306,3 +306,15 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 .at-crumbs { flex-wrap: nowrap; min-width: 0; overflow: hidden; }
 .at-crumb { white-space: nowrap; }
 .at-bar .link-btn { white-space: nowrap; flex: none; }
+
+.at-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); white-space: nowrap; cursor: pointer; flex: none; }
+.at-toggle input { accent-color: var(--accent); }
+.at-fig { position: relative; }
+.at-fig.restricted { overflow: hidden; border-radius: 8px; }
+.at-fig.restricted img { transition: filter .2s; }
+body:not(.at-reveal) .at-fig.restricted img { filter: blur(9px); transform: scale(1.06); }
+body:not(.at-reveal) .at-lightbox.restricted img { filter: blur(22px); clip-path: inset(0 round 8px); transform: scale(1.0); }
+.at-lightbox { overflow: hidden; }
+.at-blur-tag { position: absolute; top: 8px; left: 8px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #0b1220d9; border: 1px solid var(--line); color: #c5cee0; pointer-events: none; }
+body.at-reveal .at-blur-tag { display: none; }
+.at-fig.restricted figcaption { position: relative; background: var(--panel); }

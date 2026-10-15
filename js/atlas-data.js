@@ -11,7 +11,8 @@
   // Pictures that illustrate a node (shown in the side panel, click to enlarge). Web-sized copies of the files in
   // pictures-for-atlas-context/. Credits are what the pictures themselves show; fill in the missing authors.
   var IMG = 'pictures/atlas/content/';
-  function pic(file, title, credit) { return { src: IMG + file, title: title, credit: credit || '' }; }
+  // Pictures credited to Gartner are licensed content: they are blurred by default (a toggle in the Atlas reveals them).
+  function pic(file, title, credit) { return { src: IMG + file, title: title, credit: credit || '', blur: /gartner/i.test(credit || '') }; }
   function sq(id, title, caption) { return n(id, title, [], caption ? { caption: caption } : null); }   // a plain leaf
 
   var me = n('me', 'Me', [
