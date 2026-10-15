@@ -446,7 +446,8 @@
       rel.forEach(function (k) {
         var out = inSubtree(k.l.a, nid) ? k.l.b : k.l.a;
         var inner = inSubtree(k.l.a, nid) ? k.l.a : k.l.b;
-        var where = pathTo(out).slice(1).map(function (x) { return byId[x].title; }).join(' › ');
+        var op = pathTo(out), mi = op.indexOf(START);
+        var where = op.slice(mi >= 0 && op.length > mi + 1 ? mi + 1 : 1).map(function (x) { return byId[x].title; }).join(' › ');   // relative to "Me" when possible
         panelEl.appendChild(linkRow(k.l, byId[inner].title + ' ↔ ' + where, function () {
           var dest = hasKids(out) ? parent[out] || out : parent[out];
           flashId = out;

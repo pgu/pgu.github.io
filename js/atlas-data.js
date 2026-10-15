@@ -51,7 +51,7 @@
             sq('needs-segmentation', 'Needs-based segmentation'),
             sq('customer-value', 'Customer value'),
             n('voc', 'Voice of the customer', [], {
-              images: [pic('10-02-voc.jpg', 'Common Voice of the Customer (VOC) sources')] })
+              images: [pic('10-02-voc.jpg', 'Common Voice of the Customer (VOC) sources', 'source unknown')] })
           ]),
           n('pm-market', 'Market', [
             sq('market-sizing', 'Market sizing', 'TAM, SAM, SOM'),
@@ -59,7 +59,7 @@
             sq('benchmarking', 'Product benchmarking'),
             sq('tech-watch', 'Technology watch'),
             n('pestel', 'PESTEL analysis', [], {
-              images: [pic('10-01-pestel.jpg', 'PESTEL analysis (Product tool #4)')] })
+              images: [pic('10-01-pestel.jpg', 'PESTEL analysis (Product tool #4)', '© Todd Birzer')] })
           ]),
           n('positioning', 'Positioning', [
             sq('differentiation', 'Differentiation'),
@@ -68,7 +68,7 @@
               sq('p-product', 'Product'), sq('p-place', 'Place'), sq('p-promotion', 'Promotion'), sq('p-price', 'Price')
             ])
           ])
-        ], { images: [pic('10-04-double-diamond.jpg', 'The Double Diamond: discover, define, develop, deliver')] }),
+        ], { images: [pic('10-04-double-diamond.jpg', 'The Double Diamond: discover, define, develop, deliver', 'Wikipedia (it.wikipedia.org/wiki/Double_Diamond)')] }),
 
         n('strategy', 'Strategy, prioritization and roadmap', [
           n('vision-objectives', 'Vision and objectives', [
@@ -100,8 +100,8 @@
               sq('sus', 'SUS', 'System Usability Scale'), sq('csat', 'CSAT', 'customer satisfaction'), sq('nps', 'NPS', 'Net Promoter Score')
             ]),
             n('heart', 'HEART framework', [], {
-              images: [pic('10-10-heart-fw.jpg', 'HEART framework: goals, signals, metrics')] })
-          ], { images: [pic('10-11-ux-measures.jpg', 'UX measures: from leading inputs to lagging outcomes')] }),
+              images: [pic('10-10-heart-fw.jpg', 'HEART framework: goals, signals, metrics', 'Google (HEART framework)')] })
+          ], { images: [pic('10-11-ux-measures.jpg', 'UX measures: from leading inputs to lagging outcomes', 'Nielsen Norman Group (NN/g)')] }),
           n('business-metrics', 'Business metrics', [
             sq('mau', 'MAU', 'monthly active users'), sq('mrr', 'MRR', 'monthly recurring revenue'),
             sq('arpu', 'ARPU', 'average revenue per user'), sq('ltv', 'LTV', 'customer lifetime value'),
@@ -112,8 +112,8 @@
             sq('user-perception', 'User perception'), sq('satisfaction', 'Satisfaction'), sq('loyalty', 'Loyalty'),
             sq('referrals', 'Referrals'), sq('retention', 'Retention'), sq('renewals', 'Renewals'), sq('revenue-out', 'Revenue')
           ], { seq: true, images: [
-            pic('10-08-ux-rev-chain.jpg', 'The UX-revenue chain model'),
-            pic('10-09-ux-to-business.jpg', 'Correlating UX metrics with company KPIs (athenahealth)')] }),
+            pic('10-08-ux-rev-chain.jpg', 'The UX-revenue chain model', 'UXmatters (uxmatters.com)'),
+            pic('10-09-ux-to-business.jpg', 'Correlating UX metrics with company KPIs (athenahealth)', 'UXmatters (uxmatters.com)')] }),
           n('aarrr', 'AARRR', [
             sq('acquisition', 'Acquisition'), sq('activation', 'Activation'), sq('retention-aarrr', 'Retention'),
             sq('referral', 'Referral'), sq('revenue-aarrr', 'Revenue')
@@ -132,7 +132,7 @@
               sq('vh-size', 'Size'), sq('vh-color', 'Colour'), sq('vh-contrast', 'Contrast'), sq('vh-proximity', 'Proximity'), sq('vh-repetition', 'Repetition')
             ]),
             sq('golden-ratio', 'Golden ratio')
-          ], { images: [pic('11-00-visu.jpg', '5 basic visual design principles in UX')] }),
+          ], { images: [pic('11-00-visu.jpg', '5 basic visual design principles in UX', 'Nielsen Norman Group (NN/g)')] }),
           n('usability-laws', 'Usability laws and heuristics', [
             sq('squint-test', 'Squint test'),
             sq('jakobs-law', 'Jakob\'s law', 'familiarity'),
@@ -142,7 +142,9 @@
             n('cost-benefit', 'Cost-benefit analysis', [
               sq('utility', 'Utility', 'expected benefit − expected cost'), sq('interaction-cost', 'Interaction cost'), sq('perceived-value', 'Perceived value')
             ])
-          ]),
+          ], { images: [
+            pic('11-10-ux-laws_1.jpg', 'Laws of UX (1/2): Aesthetic-usability effect, Jakob\'s law, Law of proximity, ...', 'Laws of UX, Jon Yablonski (lawsofux.com)'),
+            pic('11-11-ux-laws_2.jpg', 'Laws of UX (2/2): Miller\'s law, Pareto principle, Postel\'s law, Tesler\'s law, ...', 'Laws of UX, Jon Yablonski (lawsofux.com)')] }),
           n('web-page-ux', 'Web page UX', [
             n('wp-foundations', 'Foundations', [sq('web-standards', 'Web standards'), sq('attracting-attention', 'Attracting attention'), sq('scrolling', 'Scrolling'), sq('how-users-scan', 'How users scan')]),
             n('wp-content', 'Content', [n('wp-information', 'Information', [sq('wp-entities', 'Functional entities, attributes, values, states and actions')])]),
@@ -155,6 +157,26 @@
             n('organization', 'Organization', [sq('categories-hierarchies', 'Categories and hierarchies')]),
             sq('labeling', 'Labeling'),
             n('metadata', 'Metadata', [sq('taxonomies-tags', 'Taxonomies and tags'), sq('ontologies', 'Ontologies')])
+          ]),
+          n('ui-states', 'UI states and flows', [
+            n('happy-path', 'Happy path', [
+              sq('main-goal', 'Main user goal'), sq('entry-point', 'Entry point'), sq('key-steps', 'Key steps'), sq('success-confirmation', 'Success confirmation')
+            ]),
+            n('empty-states', 'Empty states', [
+              sq('first-use', 'First use', 'blank slate'), sq('no-results', 'No results', 'empty search'), sq('cleared-completed', 'Cleared or completed'),
+              sq('empty-cta', 'Call to action'), sq('onboarding-hints', 'Onboarding hints')
+            ]),
+            n('loading-states', 'Loading states', [
+              sq('spinner', 'Spinner'), sq('progress-bar', 'Progress bar'), sq('skeleton-screen', 'Skeleton screen'),
+              sq('optimistic-ui', 'Optimistic UI'), sq('perceived-performance', 'Perceived performance')
+            ]),
+            n('error-states', 'Error states and recovery', [
+              sq('validation-errors', 'Validation errors'), sq('system-errors', 'System errors'), sq('not-found', 'Not found', '404'),
+              sq('offline', 'Offline'), sq('permission-denied', 'Permission denied'), sq('retry-undo', 'Retry and undo'), sq('plain-language', 'Plain-language messages')
+            ]),
+            n('edge-cases', 'Edge cases', [
+              sq('partial-data', 'Partial data'), sq('long-text', 'Very long text'), sq('too-many-items', 'Too many items'), sq('slow-network', 'Slow networks')
+            ])
           ])
         ]),
 
@@ -165,7 +187,7 @@
             sq('web-apis', 'Web APIs')
           ], { images: [pic('11-01-browser.jpg', 'What happens when you enter a URL in the browser', '© ByteByteGo')] }),
           n('web-specs', 'Specs evolution', [
-            sq('ecmascript', 'ECMAScript'), sq('html-css-a11y', 'HTML, CSS and accessibility'), sq('browser-support', 'Browser support differences')
+            sq('ecmascript', 'ECMAScript'), sq('html-css-a11y', 'HTML, CSS and accessibility'), n('browser-support', 'Browser support differences', [], { images: [pic('11-09-caniuse.jpg', 'Can I use: CSS Grid Layout browser support', 'Can I use (caniuse.com)')] })
           ]),
           n('js-eco', 'JS ecosystem', [
             n('js-frameworks', 'Frameworks', [sq('react', 'React'), sq('angularjs', 'AngularJS'), sq('gwt', 'GWT')]),
@@ -182,12 +204,14 @@
         ]),
 
         n('api-tech', 'API technologies', [
-          n('http', 'Network', [sq('http-protocol', 'HTTP')]),
+          n('http', 'Network', [sq('http-protocol', 'HTTP')], { images: [pic('11-08-osi.jpg', 'What is the OSI model', '© ByteByteGo')] }),
           n('rest', 'REST', [sq('rest-methods', 'Methods'), sq('media-types', 'Media types'), sq('payload', 'Payload'), sq('response-codes', 'Response codes'), sq('rest-security', 'Security')]),
           n('api-specs', 'Specs and formats', [
             n('openapi', 'OpenAPI', [sq('overlays', 'Overlays'), sq('arazzo', 'Arazzo')]),
             sq('asyncapi', 'AsyncAPI'), sq('graphql', 'GraphQL')
-          ]),
+          ], { images: [
+            pic('11-06-api-mcp-standards.jpg', 'How API standards relate to each other (OpenAPI, AsyncAPI, Arazzo, Overlay, MCP, A2A, ...)', 'API Evangelist (standards.apievangelist.com/relationships)'),
+            pic('11-07-api-std-comp.jpg', 'Vocabulary shared between API standards', 'API Evangelist (standards.apievangelist.com/relationships)')] }),
           n('api-mgmt', 'API management', [sq('rate-limiting', 'Rate limiting'), sq('authentication', 'Authentication'), sq('dev-portal', 'Documentation and developer portal'), sq('monetization', 'Monetization')])
         ], { images: [pic('11-03-api.jpg', 'API protocols', '© ByteByteGo and Postman')] }),
 
@@ -243,7 +267,10 @@
     { a: 'magic-quadrants', b: 'competitors', label: 'analysts rank competitors' },
     { a: 'critical-capabilities', b: 'prioritization', label: 'capability gaps drive priorities' },
     { a: 'info-arch', b: 'data-cartography', label: 'metadata and taxonomies' },
-    { a: 'api-tech', b: 'analysts', label: 'API market analysis' }
+    { a: 'api-tech', b: 'analysts', label: 'API market analysis' },
+    { a: 'loading-states', b: 'frontend-perf', label: 'perceived vs real speed' },
+    { a: 'error-states', b: 'response-codes', label: 'the HTTP errors behind the messages' },
+    { a: 'happy-path', b: 'task-completion', label: 'the metric that tells whether it works' }
   ];
 
   // The very top: deep space. One tiny patch of sky holds thousands of galaxies; ours is one of them.
