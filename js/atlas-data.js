@@ -27,13 +27,32 @@
     ], { hue: 200 }),
 
     n('market', 'Understanding the market', [
-      n('data-cartography', 'Data management cartography'),
-      n('competitors', 'Competitors products'),
-      n('analysts', 'Analysts materials', [
-        n('ref-arch', 'Reference architectures'),
-        n('personas', 'Personas'),
-        n('magic-quadrants', 'Magic Quadrants'),
-        n('critical-capabilities', 'Critical Capabilities')
+      n('market-landscape', 'Market landscape', [
+        sq('data-integration', 'Data integration', 'main focus'),
+        sq('bi-market', 'BI', 'under watch'),
+        sq('ai-market', 'AI', 'under watch'),
+        sq('api-market', 'API market', 'previous focus'),
+        sq('data-cartography', 'Data management cartography')
+      ]),
+      n('competitor-analysis', 'Competitor analysis', [
+        sq('competitors', 'Competitor products'),
+        sq('competitor-swot', 'Competitor SWOT'),
+        sq('analysis-sources', 'Sources', 'news, blogs, analyst assessments')
+      ]),
+      n('analysts', 'Market analysts', [
+        n('analyst-assessments', 'Competitor assessments', [
+          sq('magic-quadrants', 'Magic Quadrants'),
+          sq('critical-capabilities', 'Critical Capabilities'),
+          sq('other-comparisons', 'Other comparisons')
+        ]),
+        n('tech-trends', 'Technology trends', [
+          sq('personas', 'Personas'),
+          sq('persona-architecture', 'Persona × architecture'),
+          n('trend-architecture', 'Architecture', [
+            sq('ref-arch', 'Reference architectures'), sq('data-fabric', 'Data fabric'),
+            sq('metadata-trend', 'Metadata'), sq('data-quality', 'Data quality')
+          ])
+        ])
       ])
     ], { hue: 150 }),
 
@@ -272,6 +291,8 @@
     { a: 'critical-capabilities', b: 'prioritization', label: 'capability gaps drive priorities' },
     { a: 'info-arch', b: 'data-cartography', label: 'metadata and taxonomies' },
     { a: 'api-tech', b: 'analysts', label: 'API market analysis' },
+    { a: 'competitor-swot', b: 'analyst-assessments', label: 'my view vs the analysts\' view' },
+    { a: 'trend-architecture', b: 'data-arch', label: 'same subject, two sources' },
     { a: 'loading-states', b: 'frontend-perf', label: 'perceived vs real speed' },
     { a: 'error-states', b: 'response-codes', label: 'the HTTP errors behind the messages' },
     { a: 'happy-path', b: 'task-completion', label: 'the metric that tells whether it works' }
