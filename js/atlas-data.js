@@ -205,7 +205,9 @@
 
         n('api-tech', 'API technologies', [
           n('http', 'Network', [sq('http-protocol', 'HTTP')], { images: [pic('11-08-osi.jpg', 'What is the OSI model', '© ByteByteGo')] }),
-          n('rest', 'REST', [sq('rest-methods', 'Methods'), sq('media-types', 'Media types'), sq('payload', 'Payload'), sq('response-codes', 'Response codes'), sq('rest-security', 'Security')]),
+          n('rest', 'REST', [sq('rest-methods', 'Methods'), sq('media-types', 'Media types'), sq('payload', 'Payload'), sq('response-codes', 'Response codes'), sq('rest-security', 'Security')], { images: [
+            pic('11-12-tips-rest-api-design_1.jpg', 'Top 8 tips for RESTful API design', '© ByteByteGo'),
+            pic('11-13-tips-rest-api-design_2.jpg', 'REST API design best practices', '© ByteByteGo')] }),
           n('api-specs', 'Specs and formats', [
             n('openapi', 'OpenAPI', [sq('overlays', 'Overlays'), sq('arazzo', 'Arazzo')]),
             sq('asyncapi', 'AsyncAPI'), sq('graphql', 'GraphQL')
@@ -213,7 +215,9 @@
             pic('11-06-api-mcp-standards.jpg', 'How API standards relate to each other (OpenAPI, AsyncAPI, Arazzo, Overlay, MCP, A2A, ...)', 'API Evangelist (standards.apievangelist.com/relationships)'),
             pic('11-07-api-std-comp.jpg', 'Vocabulary shared between API standards', 'API Evangelist (standards.apievangelist.com/relationships)')] }),
           n('api-mgmt', 'API management', [sq('rate-limiting', 'Rate limiting'), sq('authentication', 'Authentication'), sq('dev-portal', 'Documentation and developer portal'), sq('monetization', 'Monetization')])
-        ], { images: [pic('11-03-api.jpg', 'API protocols', '© ByteByteGo and Postman')] }),
+        ], { images: [
+          pic('11-03-api.jpg', 'API protocols', '© ByteByteGo and Postman'),
+          pic('11-14-api-roadmap.jpg', 'The ultimate API learning roadmap', '© ByteByteGo')] }),
 
         n('java-eco', 'Java ecosystem', [
           sq('jakarta-ee', 'Jakarta EE', 'formerly J2EE'),
