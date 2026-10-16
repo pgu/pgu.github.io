@@ -32,13 +32,15 @@
         sq('data-integration', 'Data integration', 'main focus'),
         sq('bi-market', 'BI', 'under watch'),
         sq('ai-market', 'AI', 'under watch'),
-        sq('api-market', 'API market', 'previous focus'),
-        sq('data-cartography', 'Data management cartography')
+        sq('api-market', 'API market', 'previous focus')
       ]),
       n('competitor-analysis', 'Competitor analysis', [
         sq('competitors', 'Competitor products'),
-        sq('competitor-swot', 'Competitor SWOT'),
-        sq('analysis-sources', 'Sources', 'news, blogs, analyst assessments')
+        sq('competitor-swot', 'Competitor SWOT', 'competitive cards in the app'),
+        sq('analysis-sources', 'Sources', 'analysts, news, blogs, vendor updates'),
+        n('data-cartography', 'Data management cartography', [], { caption: 'my own app', images: [
+          pic('m-30-data-management-app.jpg', 'Data Management Cartography: the base layout, competitors listed on top', '© Pascal Guilcher (own app)'),
+          pic('m-31-data-management-with-competitors.jpg', 'The same cartography filled in with competitor information (partial view)', '© Pascal Guilcher (own app)')] })
       ]),
       n('analysts', 'Market analysts', [
         n('analyst-assessments', 'Competitor assessments', [
