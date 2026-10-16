@@ -176,12 +176,21 @@
     if (N >= 2 && N <= 8) {   // title of the level in the hole of the ring
       var c = el('div', 'at-center');
       c.style.left = C.x + 'px'; c.style.top = C.y + 'px';
-      c.appendChild(el('b', null, byId[id].title));
-      if (parent[id]) {   // the hub is also the way back up
-        c.classList.add('up');
-        c.appendChild(el('span', 'at-up-hint', '⤴ ' + byId[parent[id]].title));
-        c.title = 'Zoom out to ' + byId[parent[id]].title;
-        c.addEventListener('click', function () { if (!busy && !animating && !trans) zoomOut(); });
+      // 1) the level's own name: click to select it (back to the level's details in the side panel)
+      var sel = el('button', 'at-center-title', byId[id].title);
+      sel.title = 'Show the details of ' + byId[id].title;
+      sel.addEventListener('click', function () {
+        if (trans) return;
+        selected = null; showInfo(null);
+        sel.classList.remove('picked'); void sel.offsetWidth; sel.classList.add('picked');
+      });
+      c.appendChild(sel);
+      // 2) below: the way up
+      if (parent[id]) {
+        var up = el('button', 'at-center-up', '⤴ ' + byId[parent[id]].title);
+        up.title = 'Zoom out to ' + byId[parent[id]].title;
+        up.addEventListener('click', function () { if (!busy && !animating && !trans) zoomOut(); });
+        c.appendChild(up);
       }
       layer.appendChild(c);
     }
