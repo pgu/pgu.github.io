@@ -35,14 +35,27 @@
         sq('api-market', 'API market', 'previous focus'),
         n('analysis-sources', 'Sources', [], { caption: 'analysts, news, blogs, books, vendor updates', images: [
           pic('m-40-data-eng-book.jpg', 'A reference book: Fundamentals of Data Engineering', '© O\'Reilly, Joe Reis and Matt Housley'),
-          pic('m-41-data-eng-lifecycle.jpg', 'From the book: the data engineering lifecycle and its undercurrents (figure 2-7)', '© O\'Reilly, Joe Reis and Matt Housley')] })
+          pic('m-41-data-eng-lifecycle.jpg', 'From the book: the data engineering lifecycle and its undercurrents (figure 2-7)', '© O\'Reilly, Joe Reis and Matt Housley'),
+          pic('m-42-mad-landscape.jpg', 'The 2025 MAD (ML, AI & Data) landscape', '© Matt Turck and FirstMark (MAD landscape, 2025)'),
+          pic('m-43-db-select.jpg', 'How to choose the right database?', '© ByteByteGo'),
+          pic('m-44-db-cloud.jpg', 'Cloud database cheat sheet', '© ByteByteGo')] })
       ]),
       n('competitor-analysis', 'Competitor analysis', [
         sq('competitors', 'Competitor products'),
         sq('competitor-swot', 'Competitor SWOT', 'competitive cards in the app'),
         n('data-cartography', 'Data management cartography', [], { caption: 'my own app', images: [
           pic('m-30-data-management-app.jpg', 'Data Management Cartography: the base layout, competitors listed on top', '© Pascal Guilcher (own app)'),
-          pic('m-31-data-management-with-competitors.jpg', 'The same cartography filled in with competitor information (partial view)', '© Pascal Guilcher (own app)')] })
+          pic('m-31-data-management-with-competitors.jpg', 'The same cartography filled in with competitor information (partial view)', '© Pascal Guilcher (own app)')] }),
+        n('our-offering', 'Our offering', [
+          sq('offer-analytics', 'Analytics', 'Qlik Sense'),
+          sq('offer-integration', 'Data integration', 'Talend Studio, big data'),
+          sq('offer-quality', 'Data quality'),
+          sq('offer-catalog', 'Data catalog'),
+          sq('offer-api', 'API services'),
+          sq('offer-cloud', 'Cloud administration'),
+          n('certifications', 'Product certifications', [], { caption: 'how I learned the portfolio', images: [
+            pic('m-50-certificates.jpg', 'Qlik and Talend practitioner certifications (2023)', '© Qlik')] })
+        ], { caption: 'to compare with competitors' })
       ]),
       n('analysts', 'Market analysts', [
         n('analyst-assessments', 'Competitor assessments', [
