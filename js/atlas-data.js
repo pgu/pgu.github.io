@@ -31,7 +31,7 @@
         n('tech-arch', 'Technology architecture')
       ], { images: [
         pic('c-02-togaf.jpg', 'The TOGAF architecture development method (ADM): business, application and technology layers', '© The Open Group, TOGAF® Specification')] }),
-      n('data-in-practice', 'Data architecture in practice', [
+      n('data-in-practice', 'Data stack in practice', [
         sq('data-stack', 'Data stack overview'),
         n('stack-personas', 'Personas along the stack', [], { caption: 'operational vs analytical', images: [
           pic('c-05-data-team.jpg', 'How modern data teams work: architect, engineer, analyst, scientist, BI developer, ML engineer', 'DataWithBaraa, Baraa Khatib Salkini (YouTube: "How Modern Data Teams Work")')] })
@@ -43,10 +43,10 @@
 
     n('market', 'Understanding the market', [
       n('market-landscape', 'Market landscape', [
-        sq('data-integration', 'Data integration', 'main focus'),
+        sq('data-integration', 'Data integration', 'main focus, incl. iPaaS and data quality'),
         sq('bi-market', 'BI', 'under watch'),
         sq('ai-market', 'AI', 'under watch'),
-        sq('api-market', 'API market', 'previous focus'),
+        sq('api-market', 'API management', 'previous focus'),
         n('analysis-sources', 'Sources', [], { caption: 'analysts, news, blogs, books, vendor updates', images: [
           pic('m-40-data-eng-book.jpg', 'A reference book: Fundamentals of Data Engineering', '© O\'Reilly, Joe Reis and Matt Housley'),
           pic('m-41-data-eng-lifecycle.jpg', 'From the book: the data engineering lifecycle and its undercurrents (figure 2-7)', '© O\'Reilly, Joe Reis and Matt Housley'),
@@ -93,7 +93,7 @@
             n('cc-ratings', 'Product ratings per capability', [], { images: [pic('m-28-cc-assess.jpg', 'Product/service rating on critical capabilities', '© Gartner')] }),
             n('cc-scores', 'Product scores per use case', [], { images: [pic('m-29-cc-uc-assess.jpg', 'Product score in use cases', '© Gartner')] })
           ], { caption: 'the deep dive companion' }),
-          n('other-comparisons', 'Other comparisons', [
+          n('other-comparisons', 'Other analyst reports', [
             n('barc', 'BARC Score', [], { images: [pic('m-24-barc-scores.jpg', 'BARC Score reports over the years', '© BARC (BARC Score)')] }),
             n('forrester', 'Forrester Wave', [], { images: [pic('m-25-forrester-waves.jpg', 'The Forrester Wave: several categories', '© Forrester (The Forrester Wave)')] })
           ])
@@ -106,7 +106,7 @@
             pic('m-09-integration_persona.jpg', 'Hybrid integration capability framework (role-based user experience)', '© Gartner'),
             pic('m-10-integration_persona_matrix.jpg', 'Detailed integration capability matrix (persona × capability)', '© Gartner'),
             pic('m-13-persona-semantic.jpg', 'Introducing knowledge graphs to different personas', '© Gartner')] }),
-          n('trend-architecture', 'Architecture', [
+          n('trend-architecture', 'Data architecture trends', [
             n('ref-arch', 'Reference architectures', [], { images: [
               pic('m-00-data-journey.jpg', 'Data and analytics pipeline: conceptual architecture', '© Gartner'),
               pic('m-04-data-journey_deep.jpg', 'Reference architecture for data management', '© Gartner'),
@@ -141,7 +141,7 @@
           ]),
           n('pm-market', 'Market', [
             sq('market-sizing', 'Market sizing', 'TAM, SAM, SOM'),
-            sq('competitive-analysis', 'Competitive analysis', 'incl. product benchmarking'),
+            sq('competitive-analysis', 'Competitive benchmarking', 'incl. competitive analysis'),
             sq('tech-watch', 'Technology watch'),
             n('pestel', 'PESTEL analysis', [], {
               images: [pic('10-01-pestel.jpg', 'PESTEL analysis (Product tool #4)', '© Todd Birzer')] })
@@ -210,7 +210,7 @@
             sq('gestalt', 'Gestalt', 'similarity, continuation, closure'),
             sq('balance', 'Balance'), sq('scale', 'Scale'), sq('contrast', 'Contrast'),
             n('visual-hierarchy', 'Visual hierarchy', [
-              sq('vh-size', 'Size'), sq('vh-color', 'Colour'), sq('vh-contrast', 'Contrast'), sq('vh-proximity', 'Proximity'), sq('vh-repetition', 'Repetition')
+              sq('vh-size', 'Size'), sq('vh-color', 'Colour'), sq('vh-proximity', 'Proximity'), sq('vh-repetition', 'Repetition')
             ]),
             sq('golden-ratio', 'Golden ratio')
           ], { images: [pic('11-00-visu.jpg', '5 basic visual design principles in UX', 'Nielsen Norman Group (NN/g)')] }),
