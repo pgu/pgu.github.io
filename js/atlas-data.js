@@ -11,8 +11,8 @@
   // Pictures that illustrate a node (shown in the side panel, click to enlarge). Web-sized copies of the files in
   // pictures-for-atlas-context/. Credits are what the pictures themselves show; fill in the missing authors.
   var IMG = 'pictures/atlas/content/';
-  // Pictures credited to Gartner are licensed content: they are blurred by default (a toggle in the Atlas reveals them).
-  function pic(file, title, credit) { return { src: IMG + file, title: title, credit: credit || '', blur: /gartner/i.test(credit || '') }; }
+  // Pictures credited to Gartner, BARC or Forrester (licensed analyst content): they are blurred by default (a toggle in the Atlas reveals them).
+  function pic(file, title, credit) { return { src: IMG + file, title: title, credit: credit || '', blur: /gartner|barc|forrester/i.test(credit || '') }; }
   function sq(id, title, caption) { return n(id, title, [], caption ? { caption: caption } : null); }   // a plain leaf
 
   var me = n('me', 'Me', [
@@ -42,17 +42,52 @@
       ]),
       n('analysts', 'Market analysts', [
         n('analyst-assessments', 'Competitor assessments', [
-          sq('magic-quadrants', 'Magic Quadrants'),
-          sq('critical-capabilities', 'Critical Capabilities'),
-          sq('other-comparisons', 'Other comparisons')
-        ]),
-        n('tech-trends', 'Technology trends', [
-          sq('personas', 'Personas'),
-          sq('persona-architecture', 'Persona × architecture'),
-          n('trend-architecture', 'Architecture', [
-            sq('ref-arch', 'Reference architectures'), sq('data-fabric', 'Data fabric'),
-            sq('metadata-trend', 'Metadata'), sq('data-quality', 'Data quality')
+          n('magic-quadrants', 'Magic Quadrants', [
+            n('mq-reading', 'How to read it', [], { caption: 'ability to execute × completeness of vision', images: [
+              pic('m-22-mq-reminder.jpg', 'Magic Quadrant: the two axes and what they measure', '© Gartner')] }),
+            n('mq-beyond', 'Beyond the graphic', [
+              sq('mq-market-overview', 'Market overview'),
+              sq('mq-vendors-moves', 'Vendors added and dropped'),
+              sq('honorable-mentions', 'Honorable mentions', 'tomorrow\'s threats')
+            ], { images: [
+              pic('m-26-mq-moves-honorable-mentions_market-overview_vendors-dropped-added.jpg', 'Two editions of the same Magic Quadrant: vendors that moved, were added or dropped', '© Gartner'),
+              pic('m-21-docs-reco.jpg', 'Common mistakes to avoid when using the Magic Quadrant', '© Gartner')] }),
+            n('mq-over-time', 'Follow-up over time', [
+              sq('mq-apim', 'API management'), sq('mq-ipaas', 'iPaaS'), sq('mq-di', 'Data integration'),
+              sq('mq-dq', 'Data quality'), sq('mq-bi', 'BI')
+            ], { images: [pic('m-23-mqs-categories-years.jpg', 'Magic Quadrants of several categories, edition after edition', '© Gartner')] })
+          ]),
+          n('critical-capabilities', 'Critical Capabilities', [
+            n('cc-weights', 'Weights per use case', [], { images: [pic('m-27-cc-weights.jpg', 'Weighting for critical capabilities in use cases', '© Gartner')] }),
+            n('cc-ratings', 'Product ratings per capability', [], { images: [pic('m-28-cc-assess.jpg', 'Product/service rating on critical capabilities', '© Gartner')] }),
+            n('cc-scores', 'Product scores per use case', [], { images: [pic('m-29-cc-uc-assess.jpg', 'Product score in use cases', '© Gartner')] })
+          ], { caption: 'the deep dive companion' }),
+          n('other-comparisons', 'Other comparisons', [
+            n('barc', 'BARC Score', [], { images: [pic('m-24-barc-scores.jpg', 'BARC Score reports over the years', '© BARC (BARC Score)')] }),
+            n('forrester', 'Forrester Wave', [], { images: [pic('m-25-forrester-waves.jpg', 'The Forrester Wave: several categories', '© Forrester (The Forrester Wave)')] })
           ])
+        ], { images: [pic('m-20-docs.jpg', 'Gartner proprietary research methodologies', '© Gartner')] }),
+        n('tech-trends', 'Technology trends', [
+          n('personas', 'Personas', [], { images: [
+            pic('m-11-persona-data.jpg', 'Focus on other key personas: the teams', '© Gartner'),
+            pic('m-12-persona-int.jpg', 'Persona: software engineers', '© Gartner')] }),
+          n('persona-architecture', 'Persona × architecture', [], { images: [
+            pic('m-09-integration_persona.jpg', 'Hybrid integration capability framework (role-based user experience)', '© Gartner'),
+            pic('m-10-integration_persona_matrix.jpg', 'Detailed integration capability matrix (persona × capability)', '© Gartner'),
+            pic('m-13-persona-semantic.jpg', 'Introducing knowledge graphs to different personas', '© Gartner')] }),
+          n('trend-architecture', 'Architecture', [
+            n('ref-arch', 'Reference architectures', [], { images: [
+              pic('m-00-data-journey.jpg', 'Data and analytics pipeline: conceptual architecture', '© Gartner'),
+              pic('m-04-data-journey_deep.jpg', 'Reference architecture for data management', '© Gartner'),
+              pic('m-01-data-journey_a16z.jpg', 'Unified data infrastructure (2.0)', '© a16z, Emerging architectures for modern data infrastructure (a16z.com/emerging-architectures-for-modern-data-infrastructure)')] }),
+            n('data-fabric', 'Data fabric', [], { images: [
+              pic('m-06-data-archi_ev2.jpg', 'Technology pillars of data fabric', '© Gartner'),
+              pic('m-08-semantic-layer.jpg', 'Semantic layer powered by a knowledge graph', '© Gartner')] }),
+            n('metadata-trend', 'Metadata', [], { images: [pic('m-07-metadata.jpg', 'Metadata types', '© Eckerson Group')] }),
+            n('data-quality', 'Data quality', [], { images: [pic('m-03-data-journey_dq.jpg', 'Engineering principles for data quality', '© Eckerson Group')] })
+          ], { images: [
+            pic('m-05-data-archi_ev.jpg', 'The evolution of data architecture', '© Gartner'),
+            pic('m-02-data-journey_int.jpg', 'Data-centric integration', '© Gartner')] })
         ])
       ])
     ], { hue: 150 }),
@@ -293,6 +328,7 @@
     { a: 'info-arch', b: 'data-cartography', label: 'metadata and taxonomies' },
     { a: 'api-tech', b: 'analysts', label: 'API market analysis' },
     { a: 'competitor-swot', b: 'analyst-assessments', label: 'my view vs the analysts\' view' },
+    { a: 'honorable-mentions', b: 'competitors', label: 'today\'s mention, tomorrow\'s competitor' },
     { a: 'trend-architecture', b: 'data-arch', label: 'same subject, two sources' },
     { a: 'loading-states', b: 'frontend-perf', label: 'perceived vs real speed' },
     { a: 'error-states', b: 'response-codes', label: 'the HTTP errors behind the messages' },

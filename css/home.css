@@ -318,3 +318,6 @@ body:not(.at-reveal) .at-lightbox.restricted img { filter: blur(22px); clip-path
 .at-blur-tag { position: absolute; top: 8px; left: 8px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #0b1220d9; border: 1px solid var(--line); color: #c5cee0; pointer-events: none; }
 body.at-reveal .at-blur-tag { display: none; }
 .at-fig.restricted figcaption { position: relative; background: var(--panel); }
+.at-crumb:not(.on) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.at-crumb.on { flex: none; }
+.at-sep { flex: none; }
