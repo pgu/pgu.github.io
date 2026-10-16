@@ -266,7 +266,6 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 .at-panel h3 { margin: 14px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 .at-panel h3:first-child { margin-top: 0; }
 .at-panel h2 { margin: 0 0 4px; font-size: 20px; letter-spacing: -.01em; }
-.at-path { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
 .at-link { padding: 6px 0; border-bottom: 1px solid #1a2540; }
 .at-link em { display: block; color: var(--muted); font-size: 12px; font-style: normal; }
 .at-link .link-btn { color: var(--accent); }
@@ -329,3 +328,9 @@ button.at-tick:hover i { background: var(--accent); }
 .at-node.discreet .at-caption { font-size: 11px; opacity: .8; }
 .at-badge { background: transparent; border: 0; padding: 0; color: var(--muted); opacity: .75; display: inline-flex; align-items: center; gap: 6px; }
 .at-badge .at-pic { display: inline-flex; }
+
+.at-link .at-details { list-style: none; margin: 4px 0 2px; padding: 0 0 0 10px; border-left: 2px solid var(--line); }
+.at-link .at-details li { font-size: 12px; color: #aab5cc; padding: 2px 0; }
+.at-link .at-details li em { display: block; }
+.at-back { display: block; width: 100%; margin: 0 0 12px; padding: 6px 10px; text-align: left; background: #38bdf81a; border: 1px solid var(--accent); color: var(--accent); border-radius: 8px; cursor: pointer; font: inherit; font-size: 13px; }
+.at-back:hover { background: #38bdf833; }

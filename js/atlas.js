@@ -118,16 +118,12 @@
     lab.style.fontSize = Math.max(11, Math.min(21, p.r * .21)) + 'px';
     lab.style.maxWidth = (p.r * 1.65) + 'px';
     e.appendChild(lab);
-    var ext = D.links.filter(function (l) { return inSubtree(l.a, n.id) !== inSubtree(l.b, n.id); }).length;
     var hasPics = imageCount(n.id) > 0 && depthOf[n.id] > depthOf[ME_ID];   // no picture hint on "me" and the cosmic levels above
-    if (ext || hasPics) {
+    if (hasPics) {      // discreet hint: at least one picture in this node or below
       var badge = el('span', 'at-badge');
-      if (ext) badge.appendChild(el('span', null, '↔ ' + ext));
-      if (hasPics) {
-        var ic = el('span', 'at-pic'); ic.title = 'Contains pictures';
-        ic.innerHTML = PIC_ICON;     // static markup, no user input
-        badge.appendChild(ic);
-      }
+      var ic = el('span', 'at-pic'); ic.title = 'Contains pictures';
+      ic.innerHTML = PIC_ICON;     // static markup, no user input
+      badge.appendChild(ic);
       e.appendChild(badge);
     }
     e.addEventListener('click', function () { onNode(n.id); });
@@ -243,6 +239,7 @@
     cur = trans.t >= .5 ? trans.c : trans.p;
     trans = null;
     selected = null;
+    if (backTo && cur === backTo.id) backTo = null;      // back where we started
     render(); updateUI();
     if (flashId) { flash(flashId); flashId = null; }
   }
@@ -343,7 +340,7 @@
   outBtn.addEventListener('click', function () { if (!busy && !animating) zoomOut(); });
 
   /* ---------- breadcrumb, ruler, side panel ---------- */
-  var selected = null;
+  var selected = null, backTo = null;
 
   function updateUI() {
     crumbsEl.textContent = '';
@@ -421,6 +418,17 @@
     return gal;
   }
 
+  // Group the links of a level by the pair of items they connect (order-insensitive).
+  function mergeInternal(list) {
+    var groups = [], by = {};
+    list.forEach(function (k) {
+      var key = k.a < k.b ? k.a + '|' + k.b : k.b + '|' + k.a;
+      if (!by[key]) { by[key] = { a: k.a, b: k.b, items: [] }; groups.push(by[key]); }
+      by[key].items.push(k);
+    });
+    return groups;
+  }
+
   function linkRow(l, text, onGo, goLabel) {
     var row = el('div', 'at-link');
     row.appendChild(el('span', null, text));
@@ -433,14 +441,19 @@
     var node = byId[id || selected || cur];
     panelEl.textContent = '';
     var nid = node.id;
+    if (backTo) {     // after a "Go ›" jump: one click to return to where you were
+      var back = el('button', 'at-back', '↩ Back to ' + backTo.title);
+      back.addEventListener('click', function () {
+        var to = backTo.id; backTo = null;
+        if (to !== cur && !busy && !animating && !trans) goTo(to); else showInfo(null);
+      });
+      panelEl.appendChild(back);
+    }
     panelEl.appendChild(el('h3', null, id || selected ? 'Topic' : 'This level'));
     panelEl.appendChild(el('h2', null, node.title));
-    panelEl.appendChild(el('div', 'at-path', pathTo(nid).map(function (x) { return byId[x].title; }).join(' › ')));
     var credit = (nid === cur && !id && !selected && node.levelCredit) ? node.levelCredit : node.credit;
     if (credit) panelEl.appendChild(el('div', 'at-credit', 'Image: ' + credit));
-    var kids = node.children.length, hasImgs = node.images && node.images.length;
-    panelEl.appendChild(el('p', null, (kids ? kids + ' item' + (kids > 1 ? 's' : '') + ' inside. Click to zoom in.'
-      : hasImgs ? '' : 'Leaf. Text or animation can live here later.') + (hasImgs ? (kids ? ' ' : '') + 'Click a picture to enlarge it.' : '')));
+    var hasImgs = node.images && node.images.length;
     if (hasImgs) panelEl.appendChild(gallery(node));
 
     var rel = D.links.map(function (l, i) { return { l: l, i: i }; }).filter(function (k) {
@@ -449,12 +462,27 @@
     });
     if (nid === cur && !id && !selected) {   // level view: also the links among the current children
       var la = linksAt(cur);
+      // only links that join two of the items shown here; links between deeper nodes belong to those nodes
+      la.internal = la.internal.filter(function (k) { return (k.l.a === k.a && k.l.b === k.b) || (k.l.a === k.b && k.l.b === k.a); });
       if (la.internal.length) {
         panelEl.appendChild(el('h3', null, 'Links between these items'));
-        la.internal.forEach(function (k) {
-          var row = linkRow(k.l, byId[k.a].title + ' ↔ ' + byId[k.b].title);
-          row.addEventListener('mouseenter', function () { hot(k.i, true); });
-          row.addEventListener('mouseleave', function () { hot(k.i, false); });
+        mergeInternal(la.internal).forEach(function (g) {      // one entry per pair of items, details listed below
+          var row = el('div', 'at-link');
+          row.appendChild(el('span', null, byId[g.a].title + ' ↔ ' + byId[g.b].title));
+          var ul = el('ul', 'at-details');
+          g.items.forEach(function (k) {
+            var li = el('li');
+            var direct = (k.l.a === g.a && k.l.b === g.b) || (k.l.a === g.b && k.l.b === g.a);   // both ends are the items themselves
+            if (!direct) {
+              var left = inSubtree(k.l.a, g.a) ? k.l.a : k.l.b, right = left === k.l.a ? k.l.b : k.l.a;
+              li.appendChild(el('span', null, byId[left].title + ' ↔ ' + byId[right].title));
+            }
+            if (k.l.label) li.appendChild(el('em', null, k.l.label));
+            ul.appendChild(li);
+          });
+          row.appendChild(ul);
+          row.addEventListener('mouseenter', function () { g.items.forEach(function (k) { hot(k.i, true); }); });
+          row.addEventListener('mouseleave', function () { g.items.forEach(function (k) { hot(k.i, false); }); });
           panelEl.appendChild(row);
         });
       }
@@ -469,7 +497,8 @@
         panelEl.appendChild(linkRow(k.l, byId[inner].title + ' ↔ ' + where, function () {
           var dest = hasKids(out) ? parent[out] || out : parent[out];
           flashId = out;
-          if (dest === cur) { flash(out); flashId = null; } else goTo(dest);
+          if (dest === cur) { flash(out); flashId = null; }
+          else { backTo = { id: cur, title: byId[cur].title }; goTo(dest); }
         }));
       });
     }
