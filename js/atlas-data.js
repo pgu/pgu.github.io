@@ -32,14 +32,14 @@
         sq('data-integration', 'Data integration', 'main focus'),
         sq('bi-market', 'BI', 'under watch'),
         sq('ai-market', 'AI', 'under watch'),
-        sq('api-market', 'API market', 'previous focus')
+        sq('api-market', 'API market', 'previous focus'),
+        n('analysis-sources', 'Sources', [], { caption: 'analysts, news, blogs, books, vendor updates', images: [
+          pic('m-40-data-eng-book.jpg', 'A reference book: Fundamentals of Data Engineering', '© O\'Reilly, Joe Reis and Matt Housley'),
+          pic('m-41-data-eng-lifecycle.jpg', 'From the book: the data engineering lifecycle and its undercurrents (figure 2-7)', '© O\'Reilly, Joe Reis and Matt Housley')] })
       ]),
       n('competitor-analysis', 'Competitor analysis', [
         sq('competitors', 'Competitor products'),
         sq('competitor-swot', 'Competitor SWOT', 'competitive cards in the app'),
-        n('analysis-sources', 'Sources', [], { caption: 'analysts, news, blogs, books, vendor updates', images: [
-          pic('m-40-data-eng-book.jpg', 'A reference book: Fundamentals of Data Engineering', '© O\'Reilly, Joe Reis and Matt Housley'),
-          pic('m-41-data-eng-lifecycle.jpg', 'From the book: the data engineering lifecycle and its undercurrents (figure 2-7)', '© O\'Reilly, Joe Reis and Matt Housley')] }),
         n('data-cartography', 'Data management cartography', [], { caption: 'my own app', images: [
           pic('m-30-data-management-app.jpg', 'Data Management Cartography: the base layout, competitors listed on top', '© Pascal Guilcher (own app)'),
           pic('m-31-data-management-with-competitors.jpg', 'The same cartography filled in with competitor information (partial view)', '© Pascal Guilcher (own app)')] })
