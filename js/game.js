@@ -43,7 +43,7 @@
     return out;
   }
   function getPool() { return pool || (pool = buildPool()); }
-  function maxLen(level) { return Math.min(16, 8 + level * 2); }      // level 1: 10 letters ... level 4+: 16
+  function maxLen(level) { return Math.min(16, 4 + level * 2); }      // level 1: 6 letters, 2: 8, 3: 10 ... level 6+: 16
 
   var HISTORY_KEY = 'pgu-keyword-history', HISTORY_MAX = 100;
   var history = [];
