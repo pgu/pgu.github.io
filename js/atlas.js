@@ -25,6 +25,9 @@
     node.children.forEach(function (c) { index(c, node, d + 1, node.hue); });
   })(D.root, null, 0, 265);
 
+  var titleCount = {};
+  Object.keys(byId).forEach(function (k) { titleCount[byId[k].title] = (titleCount[byId[k].title] || 0) + 1; });
+
   function hasKids(id) { return byId[id].children.length > 0; }
   function pathTo(id) { var a = []; for (var x = id; x; x = parent[x]) a.unshift(x); return a; }
   function childOfAncestor(id, pid) { for (var x = id; x; x = parent[x]) if (parent[x] === pid) return x; return null; }
@@ -36,6 +39,9 @@
     return (imgCountCache[id] = n);
   }
   function inSubtree(id, rootId) { for (var x = id; x; x = parent[x]) if (x === rootId) return true; return false; }
+
+  // A link joins two of the items shown on a level only if both ends are those items themselves.
+  function isDirect(k) { return (k.l.a === k.a && k.l.b === k.b) || (k.l.a === k.b && k.l.b === k.a); }
 
   // Links between the children of `pid`, and links that leave that subtree.
   function linksAt(pid) {
@@ -145,7 +151,7 @@
       layer.appendChild(bd);
     }
     var svg = svgEl('svg', { width: W, height: H, class: 'at-edges' });
-    linksAt(id).internal.forEach(function (k) {
+    linksAt(id).internal.filter(isDirect).forEach(function (k) {
       var a = byItem[k.a], b = byItem[k.b], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
       var cx = mx + (C.x - mx) * .55, cy = my + (C.y - my) * .55;
       var path = svgEl('path', { d: 'M' + a.x + ' ' + a.y + ' Q' + cx + ' ' + cy + ' ' + b.x + ' ' + b.y, class: 'at-edge' });
@@ -457,13 +463,12 @@
     if (hasImgs) panelEl.appendChild(gallery(node));
 
     var rel = D.links.map(function (l, i) { return { l: l, i: i }; }).filter(function (k) {
-      var ia = inSubtree(k.l.a, nid), ib = inSubtree(k.l.b, nid);
-      return ia !== ib;     // one end inside this node, the other outside
+      return k.l.a === nid || k.l.b === nid;     // a link belongs to the nodes it names, not to their ancestors
     });
     if (nid === cur && !id && !selected) {   // level view: also the links among the current children
       var la = linksAt(cur);
       // only links that join two of the items shown here; links between deeper nodes belong to those nodes
-      la.internal = la.internal.filter(function (k) { return (k.l.a === k.a && k.l.b === k.b) || (k.l.a === k.b && k.l.b === k.a); });
+      la.internal = la.internal.filter(isDirect);
       if (la.internal.length) {
         panelEl.appendChild(el('h3', null, 'Links between these items'));
         mergeInternal(la.internal).forEach(function (g) {      // one entry per pair of items, details listed below
@@ -490,10 +495,9 @@
     if (rel.length) {
       panelEl.appendChild(el('h3', null, 'Linked elsewhere'));
       rel.forEach(function (k) {
-        var out = inSubtree(k.l.a, nid) ? k.l.b : k.l.a;
-        var inner = inSubtree(k.l.a, nid) ? k.l.a : k.l.b;
-        var where = byId[out].title;      // just the linked item; "Go ›" zooms to the level it lives in
-        panelEl.appendChild(linkRow(k.l, byId[inner].title + ' ↔ ' + where, function () {
+        var out = k.l.a === nid ? k.l.b : k.l.a;
+        var where = byId[out].title + (titleCount[byId[out].title] > 1 && parent[out] ? ' (' + byId[parent[out]].title + ')' : '');   // the linked item; its parent only when the name is shared
+        panelEl.appendChild(linkRow(k.l, '↔ ' + where, function () {
           var dest = hasKids(out) ? parent[out] || out : parent[out];
           flashId = out;
           if (dest === cur) { flash(out); flashId = null; }
