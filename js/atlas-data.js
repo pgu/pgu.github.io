@@ -377,5 +377,18 @@
     credit: 'Hubble eXtreme Deep Field, NASA / ESA / G. Illingworth, D. Magee, P. Oesch (UC Santa Cruz) / R. Bouwens (Leiden) / HUDF09 Team (public domain)'
   });
 
-  window.ATLAS = { root: root, links: links };
+  // Extra words for the "Keyword rain" game: terms that live in captions, long titles or pictures of each area
+  // (the node titles themselves are picked up automatically). Keyed by the area node, which sets the word colour.
+  var keywords = {
+    customers: ['Porter', 'Five forces', 'Value chain', 'Suppliers', 'Buyers', 'Substitutes', 'Rivalry', 'TOGAF', 'DAMA', 'DMBOK',
+      'Governance', 'Stewardship', 'Lineage', 'Architecture'],
+    market: ['SWOT', 'Quadrant', 'Leaders', 'Challengers', 'Visionaries', 'Niche players', 'Knowledge graph', 'Lakehouse',
+      'Data mesh', 'Landscape', 'Weights', 'Honorable'],
+    'product-mgmt': ['TAM', 'SAM', 'SOM', 'Kano', 'Jobs to be Done', 'Double Diamond', 'Discovery', 'Segmentation', 'Benchmarking',
+      'Value effort', 'SEQ', 'SUS', 'CSAT', 'NPS', 'Pirate metrics'],
+    'product-dev': ['Heuristics', 'Typography', 'Accessibility', 'Taxonomies', 'Aesthetic', 'Validation', 'Optimistic', 'Prefetch',
+      'Collections', 'OSI']
+  };
+
+  window.ATLAS = { root: root, links: links, keywords: keywords };
 })();
