@@ -303,12 +303,10 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 .at-fig { position: relative; }
 .at-fig.restricted { overflow: hidden; border-radius: 8px; }
 .at-fig.restricted img { transition: filter .2s; }
-body:not(.at-reveal) .at-fig.restricted img { filter: blur(9px); transform: scale(1.06); }
+body:not(.at-reveal) .at-fig.restricted img { filter: blur(4px); transform: scale(1.03); }
 body:not(.at-reveal) .at-lightbox.restricted img { filter: blur(22px); clip-path: inset(0 round 8px); transform: scale(1.0); }
 .at-lightbox { overflow: hidden; }
-.at-blur-tag { position: absolute; top: 8px; left: 8px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #0b1220d9; border: 1px solid var(--line); color: #c5cee0; pointer-events: none; }
-body.at-reveal .at-blur-tag { display: none; }
-.at-fig.restricted figcaption { position: relative; background: var(--panel); }
+body.at-reveal .at-fig.restricted figcaption { position: relative; background: var(--panel); }
 .at-crumb:not(.on) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .at-crumb.on { flex: none; }
 .at-sep { flex: none; }
@@ -338,3 +336,7 @@ button.at-tick:hover i { background: var(--accent); }
 @keyframes at-picked { 0% { background: #38bdf84d; } 100% { background: transparent; } }
 .at-center-up { color: var(--muted); font-size: 11px; padding: 3px 9px; border: 1px solid var(--line) !important; }
 .at-center-up:hover { color: var(--accent); border-color: var(--accent) !important; background: #38bdf81a; }
+
+.at-toggle.konami { animation: at-konami 1.2s ease-out; }
+@keyframes at-konami { 0% { background: #38bdf866; box-shadow: 0 0 0 6px #38bdf833; } 100% { background: transparent; box-shadow: none; } }
+.at-toggle { padding: 2px 8px; border-radius: 8px; }
