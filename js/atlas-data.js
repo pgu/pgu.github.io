@@ -250,7 +250,8 @@
               sq('partial-data', 'Partial data'), sq('long-text', 'Very long text'), sq('too-many-items', 'Too many items'), sq('slow-network', 'Slow networks')
             ])
           ])
-        ]),
+        ], { images: [
+          pic('11-15-ux-certificate.jpg', 'Certificate in User Experience: Human Mind and Usability, Web Page UX Design, Visual Design Fundamentals, Measuring UX and ROI, Information Architecture', 'Nielsen Norman Group (NN/g), June 2023')] }),
 
         n('web-platform', 'Browser and web platform', [
           n('browser', 'Browser', [
