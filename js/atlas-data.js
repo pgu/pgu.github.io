@@ -37,10 +37,7 @@
           pic('c-05-data-team.jpg', 'How modern data teams work: architect, engineer, analyst, scientist, BI developer, ML engineer', 'DataWithBaraa, Baraa Khatib Salkini (YouTube: "How Modern Data Teams Work")')] })
       ], { images: [
         pic('c-04-life-data.jpg', 'Life of a data: from creation to deletion (ingestion, validation, replication, ETL vs ELT, lineage, tiers)', '© ByteByteGo')] }),
-      n('data-management', 'Data management', [
-        sq('dama-governance', 'Governance disciplines', 'DAMA'),
-        sq('capability-map', 'Capability map')
-      ], { images: [
+      n('data-management', 'Data management', [], { caption: 'DAMA', images: [
         pic('c-03-dama-data-mngt.jpg', 'The DAMA data management framework: data governance around lifecycle management and foundational activities', 'DAMA International (DAMA-DMBOK)')] })
     ], { hue: 200 }),
 
@@ -144,8 +141,7 @@
           ]),
           n('pm-market', 'Market', [
             sq('market-sizing', 'Market sizing', 'TAM, SAM, SOM'),
-            sq('competitive-analysis', 'Competitive analysis'),
-            sq('benchmarking', 'Product benchmarking'),
+            sq('competitive-analysis', 'Competitive analysis', 'incl. product benchmarking'),
             sq('tech-watch', 'Technology watch'),
             n('pestel', 'PESTEL analysis', [], {
               images: [pic('10-01-pestel.jpg', 'PESTEL analysis (Product tool #4)', '© Todd Birzer')] })
@@ -153,16 +149,12 @@
           n('positioning', 'Positioning', [
             sq('differentiation', 'Differentiation'),
             sq('stp', 'Segmentation, targeting and positioning'),
-            n('marketing-mix', 'Marketing mix (the 4 Ps)', [
-              sq('p-product', 'Product'), sq('p-place', 'Place'), sq('p-promotion', 'Promotion'), sq('p-price', 'Price')
-            ])
+            sq('marketing-mix', 'Marketing mix', 'product, place, promotion, price')
           ])
         ], { images: [pic('10-04-double-diamond.jpg', 'The Double Diamond: discover, define, develop, deliver', 'Wikipedia (it.wikipedia.org/wiki/Double_Diamond)')] }),
 
         n('strategy', 'Strategy, prioritization and roadmap', [
-          n('vision-objectives', 'Vision and objectives', [
-            sq('vision', 'Vision'), sq('objectives', 'Objectives')
-          ]),
+          sq('vision-objectives', 'Vision and objectives'),
           n('pm-inputs', 'Inputs', [
             sq('insight', 'Customer, market and competitive insights'),
             sq('product-analytics', 'Product analytics and metrics tracking'),
@@ -173,8 +165,8 @@
               pic('10-07-value-effort-matrix.jpg', 'Value effort matrix', '© Todd Birzer'),
               pic('10-06-prio-matrix-gartner.jpg', 'Project prioritization matrix (impact vs effort)', '© Gartner, 2024')] }),
             n('use-case-prism', 'Use-case prism', [
-              n('business-value', 'Business value', [sq('revenue', 'Revenue'), sq('cost', 'Cost'), sq('risks', 'Risks')]),
-              n('feasibility', 'Feasibility', [sq('complexity', 'Complexity'), sq('scope', 'Scope'), sq('predictability', 'Predictability')])
+              sq('business-value', 'Business value', 'revenue, cost, risks'),
+              sq('feasibility', 'Feasibility', 'complexity, scope, predictability')
             ], { images: [pic('10-05-usecase-prism-gartner.jpg', 'A sample use-case prism', '© Gartner')] })
           ]),
           sq('roadmap', 'Roadmap')
@@ -182,20 +174,20 @@
 
         n('measuring', 'Measuring success', [
           n('ux-metrics', 'UX metrics', [
-            n('leading', 'Leading indicators', [
-              sq('usability-issues', 'Usability issues'), sq('task-completion', 'Task completion rate'), sq('seq', 'SEQ', 'Single Ease Question')
-            ]),
-            n('lagging', 'Lagging indicators', [
-              sq('sus', 'SUS', 'System Usability Scale'), sq('csat', 'CSAT', 'customer satisfaction'), sq('nps', 'NPS', 'Net Promoter Score')
-            ]),
+            sq('leading', 'Leading indicators', 'usability issues, task completion rate, SEQ (Single Ease Question)'),
+            sq('lagging', 'Lagging indicators', 'SUS (System Usability Scale), CSAT, NPS (Net Promoter Score)'),
             n('heart', 'HEART framework', [], {
               images: [pic('10-10-heart-fw.jpg', 'HEART framework: goals, signals, metrics', 'Google (HEART framework)')] })
           ], { images: [pic('10-11-ux-measures.jpg', 'UX measures: from leading inputs to lagging outcomes', 'Nielsen Norman Group (NN/g)')] }),
           n('business-metrics', 'Business metrics', [
-            sq('mau', 'MAU', 'monthly active users'), sq('mrr', 'MRR', 'monthly recurring revenue'),
-            sq('arpu', 'ARPU', 'average revenue per user'), sq('ltv', 'LTV', 'customer lifetime value'),
-            sq('nrr', 'NRR', 'net revenue retention'), sq('arr', 'ARR', 'annual recurring revenue'),
-            sq('churn', 'Churn')
+            sq('mau', 'MAU', 'monthly active users'),
+            n('revenue-metrics', 'Revenue metrics', [
+              sq('mrr', 'MRR', 'monthly recurring revenue'), sq('arr', 'ARR', 'annual recurring revenue'),
+              sq('arpu', 'ARPU', 'average revenue per user'), sq('nrr', 'NRR', 'net revenue retention')
+            ]),
+            n('customer-metrics', 'Customer metrics', [
+              sq('ltv', 'LTV', 'customer lifetime value'), sq('churn', 'Churn')
+            ])
           ], { images: [pic('10-12-saas-metrics.jpg', 'The SaaS product metrics pyramid', '© ProductPlan')] }),
           n('perception-chain', 'From perception to revenue', [
             sq('user-perception', 'User perception'), sq('satisfaction', 'Satisfaction'), sq('loyalty', 'Loyalty'),
@@ -215,7 +207,7 @@
 
         n('ux-ui', 'UX and UI design', [
           n('visual-principles', 'Visual design principles', [
-            n('gestalt', 'Gestalt', [sq('similarity', 'Similarity'), sq('continuation', 'Continuation'), sq('closure', 'Closure')]),
+            sq('gestalt', 'Gestalt', 'similarity, continuation, closure'),
             sq('balance', 'Balance'), sq('scale', 'Scale'), sq('contrast', 'Contrast'),
             n('visual-hierarchy', 'Visual hierarchy', [
               sq('vh-size', 'Size'), sq('vh-color', 'Colour'), sq('vh-contrast', 'Contrast'), sq('vh-proximity', 'Proximity'), sq('vh-repetition', 'Repetition')
@@ -236,14 +228,14 @@
             pic('11-11-ux-laws_2.jpg', 'Laws of UX (2/2): Miller\'s law, Pareto principle, Postel\'s law, Tesler\'s law, ...', 'Laws of UX, Jon Yablonski (lawsofux.com)')] }),
           n('web-page-ux', 'Web page UX', [
             n('wp-foundations', 'Foundations', [sq('web-standards', 'Web standards'), sq('attracting-attention', 'Attracting attention'), sq('scrolling', 'Scrolling'), sq('how-users-scan', 'How users scan')]),
-            n('wp-content', 'Content', [n('wp-information', 'Information', [sq('wp-entities', 'Functional entities, attributes, values, states and actions')])]),
+            sq('wp-content', 'Content', 'entities, attributes, values, states and actions'),
             n('wp-layering', 'Priority and layering', [sq('responsive', 'Responsive'), sq('grid', 'Grid')]),
             n('wp-interaction', 'Interaction', [sq('signifiers', 'Signifiers'), sq('calls-to-action', 'Calls to action')]),
             n('wp-presentation', 'Presentation', [sq('typography-color', 'Typography and colour'), sq('imagery', 'Imagery')])
           ]),
           n('info-arch', 'Information architecture', [
             sq('findability', 'Findability'), sq('discoverability', 'Discoverability'),
-            n('organization', 'Organization', [sq('categories-hierarchies', 'Categories and hierarchies')]),
+            sq('organization', 'Organization', 'categories and hierarchies'),
             sq('labeling', 'Labeling'),
             n('metadata', 'Metadata', [sq('taxonomies-tags', 'Taxonomies and tags'), sq('ontologies', 'Ontologies')])
           ]),
@@ -286,15 +278,19 @@
           ], { images: [pic('11-02-js.jpg', 'JavaScript explained', '© ByteByteGo')] }),
           n('css-eco', 'CSS ecosystem', [sq('bootstrap', 'Bootstrap'), sq('tailwind', 'Tailwind'), sq('sass', 'Sass'), sq('design-tokens', 'Design tokens'), sq('design-system', 'Design system')]),
           n('frontend-perf', 'Frontend performance', [
-            sq('selective-rendering', 'Selective rendering'), sq('code-splitting', 'Code splitting', 'modular architecture'),
-            sq('loading-sequence', 'Loading sequence'), sq('priority-loading', 'Priority-based loading'),
-            sq('tree-shaking', 'Tree shaking'), sq('prefetching', 'Pre-fetching'),
-            sq('dynamic-imports', 'Dynamic imports'), sq('compression', 'Compression')
+            n('perf-loading', 'Loading', [
+              sq('loading-sequence', 'Loading sequence'), sq('priority-loading', 'Priority-based loading'),
+              sq('prefetching', 'Pre-fetching'), sq('dynamic-imports', 'Dynamic imports')
+            ]),
+            n('perf-bundling', 'Bundling', [
+              sq('code-splitting', 'Code splitting', 'modular architecture'), sq('tree-shaking', 'Tree shaking'), sq('compression', 'Compression')
+            ]),
+            sq('selective-rendering', 'Selective rendering')
           ], { images: [pic('11-05-frontend-perf.jpg', 'Frontend performance cheatsheet', '© ByteByteGo')] })
         ]),
 
         n('api-tech', 'API technologies', [
-          n('http', 'Network', [sq('http-protocol', 'HTTP')], { images: [pic('11-08-osi.jpg', 'What is the OSI model', '© ByteByteGo')] }),
+          n('http', 'HTTP', [], { caption: 'network, the OSI model', images: [pic('11-08-osi.jpg', 'What is the OSI model', '© ByteByteGo')] }),
           n('rest', 'REST', [sq('rest-methods', 'Methods'), sq('media-types', 'Media types'), sq('payload', 'Payload'), sq('response-codes', 'Response codes'), sq('rest-security', 'Security')], { images: [
             pic('11-12-tips-rest-api-design_1.jpg', 'Top 8 tips for RESTful API design', '© ByteByteGo'),
             pic('11-13-tips-rest-api-design_2.jpg', 'REST API design best practices', '© ByteByteGo')] }),
@@ -310,10 +306,13 @@
           pic('11-14-api-roadmap.jpg', 'The ultimate API learning roadmap', '© ByteByteGo')] }),
 
         n('java-eco', 'Java ecosystem', [
-          sq('jakarta-ee', 'Jakarta EE', 'formerly J2EE'),
-          n('java-lang', 'Java language', [sq('collections', 'Collections')]),
-          n('jvm', 'JVM', [sq('gc', 'Garbage collection')], { images: [pic('11-04-jvm.jpg', 'How the JVM works', '© ByteByteGo')] }),
-          sq('spring', 'Spring'), sq('hibernate', 'Hibernate'), sq('restlet', 'Restlet'),
+          n('java-runtime', 'Language and runtime', [
+            sq('java-lang', 'Java language', 'collections'),
+            n('jvm', 'JVM', [], { caption: 'garbage collection', images: [pic('11-04-jvm.jpg', 'How the JVM works', '© ByteByteGo')] })
+          ]),
+          n('java-frameworks', 'Frameworks', [
+            sq('jakarta-ee', 'Jakarta EE', 'formerly J2EE'), sq('spring', 'Spring'), sq('hibernate', 'Hibernate'), sq('restlet', 'Restlet')
+          ]),
           n('java-build', 'Build and CI/CD', [sq('maven', 'Maven'), sq('jenkins-java', 'Jenkins')])
         ])
       ], { hue: 340 })
@@ -368,7 +367,7 @@
     { a: 'trend-architecture', b: 'data-arch', label: 'same subject, two sources' },
     { a: 'loading-states', b: 'frontend-perf', label: 'perceived vs real speed' },
     { a: 'error-states', b: 'response-codes', label: 'the HTTP errors behind the messages' },
-    { a: 'happy-path', b: 'task-completion', label: 'the metric that tells whether it works' }
+    { a: 'happy-path', b: 'leading', label: 'the metric that tells whether it works' }
   ];
 
   // The very top: deep space. One tiny patch of sky holds thousands of galaxies; ours is one of them.
