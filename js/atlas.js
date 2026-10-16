@@ -11,6 +11,9 @@
   var panelEl = document.getElementById('at-panel');
   var outBtn = document.getElementById('at-out');
   var SVG = 'http://www.w3.org/2000/svg';
+  var ME_ID = 'me';
+  // discreet picture hint: a thin outlined frame with a mountain line
+  var PIC_ICON = '<svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><rect x="1" y="2" width="10" height="8" rx="1.2" fill="none" stroke="currentColor" stroke-width="1"/><path d="M1.6 9 4.4 6 6.4 8 8 6.4 10.4 9" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- model ---------- */
@@ -99,6 +102,7 @@
     e.style.width = e.style.height = (2 * p.r) + 'px';
     e.style.setProperty('--h', n.hue);
     if (n.image) { e.classList.add('pic'); setPicture(e, n); }
+    if (n.discreet) e.classList.add('discreet');
     if (p.r < 50) e.classList.add('tiny');     // too small for its label: the label goes underneath
     if (kids) {   // miniature of the next level, positioned exactly as that level will be
       layoutOf(n.id).forEach(function (ci) {
@@ -115,10 +119,17 @@
     lab.style.maxWidth = (p.r * 1.65) + 'px';
     e.appendChild(lab);
     var ext = D.links.filter(function (l) { return inSubtree(l.a, n.id) !== inSubtree(l.b, n.id); }).length;
-    var pics = imageCount(n.id), bits = [];
-    if (ext) bits.push('↔ ' + ext);
-    if (pics) bits.push('🖼 ' + pics);
-    if (bits.length) e.appendChild(el('span', 'at-badge', bits.join('  ')));
+    var hasPics = imageCount(n.id) > 0 && depthOf[n.id] > depthOf[ME_ID];   // no picture hint on "me" and the cosmic levels above
+    if (ext || hasPics) {
+      var badge = el('span', 'at-badge');
+      if (ext) badge.appendChild(el('span', null, '↔ ' + ext));
+      if (hasPics) {
+        var ic = el('span', 'at-pic'); ic.title = 'Contains pictures';
+        ic.innerHTML = PIC_ICON;     // static markup, no user input
+        badge.appendChild(ic);
+      }
+      e.appendChild(badge);
+    }
     e.addEventListener('click', function () { onNode(n.id); });
     e.addEventListener('mouseenter', function () { showInfo(n.id); });
     e.addEventListener('mouseleave', function () { showInfo(null); });
@@ -326,7 +337,7 @@
     if (e.key === 'Escape' || e.key === 'Backspace') { e.preventDefault(); zoomOut(); }
   });
   stage.addEventListener('click', function (e) {
-    if (e.target.closest && e.target.closest('.at-node, .at-center, .at-up-pill')) return;
+    if (e.target.closest && e.target.closest('.at-node, .at-center, .at-tick')) return;
     if (selected) { selected = null; showInfo(null); }
   });
   outBtn.addEventListener('click', function () { if (!busy && !animating) zoomOut(); });
@@ -350,17 +361,8 @@
       crumbsEl.appendChild(b);
     });
     outBtn.hidden = !parent[cur];
-    updateUpPill();
     buildRuler(); updateRuler();
     showInfo(null);
-  }
-
-  var upBtn = el('button', 'at-up-pill');
-  upBtn.addEventListener('click', function () { if (!busy && !animating && !trans) zoomOut(); });
-  stage.insertBefore(upBtn, rulerEl);
-  function updateUpPill() {
-    upBtn.hidden = !parent[cur];
-    if (parent[cur]) upBtn.textContent = '⤴ ' + byId[parent[cur]].title;
   }
 
   var marker;
@@ -368,10 +370,14 @@
     rulerEl.textContent = '';
     var path = pathTo(cur);
     for (var d = 0; d <= maxDepth; d++) {
-      var t = el('div', 'at-tick' + (path[d] ? ' known' : ''));
+      var known = path[d], t = el(known ? 'button' : 'div', 'at-tick' + (known ? ' known' : '') + (known === cur ? ' here' : ''));
       t.style.top = (d / maxDepth * 100) + '%';
       t.appendChild(el('i'));
-      t.appendChild(el('span', null, path[d] ? byId[path[d]].title : ''));
+      t.appendChild(el('span', null, known ? byId[known].title : ''));
+      if (known) {     // jump straight to that level
+        t.title = known === cur ? 'You are here' : 'Zoom out to ' + byId[known].title;
+        t.addEventListener('click', function (id) { return function () { if (id !== cur && !busy && !animating && !trans) goTo(id); }; }(known));
+      }
       rulerEl.appendChild(t);
     }
     marker = el('div', 'at-marker');

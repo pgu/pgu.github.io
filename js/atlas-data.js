@@ -15,7 +15,7 @@
   function pic(file, title, credit) { return { src: IMG + file, title: title, credit: credit || '', blur: /gartner|barc|forrester/i.test(credit || '') }; }
   function sq(id, title, caption) { return n(id, title, [], caption ? { caption: caption } : null); }   // a plain leaf
 
-  var me = n('me', 'Me', [
+  var me = n('me', '(me)', [
     n('customers', 'Understanding customers', [
       n('porter5', 'The industry', [], { caption: 'Porter\'s five forces', images: [
         pic('c-00-porter-five-forces.jpg', 'Porter\'s five forces model', 'Michael E. Porter\'s model (diagram source unknown)')] }),
@@ -319,7 +319,7 @@
       ], { hue: 340 })
     ], { hue: 28 })
   ], {
-    hue: 265,
+    hue: 265, discreet: true,
     // one small pin among the city lights, in western France (Nantes), not the centre of the planet
     pos: { x: -.565, y: -.5, r: .05 },
     caption: 'one of ~8 billion'

@@ -278,9 +278,6 @@ kbd { background: var(--panel-2); border: 1px solid var(--line); border-radius: 
 .at-center.up:hover { background: #38bdf81f; }
 .at-center.up:hover .at-up-hint { color: var(--accent); }
 .at-up-hint { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); }
-.at-up-pill { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 6; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  background: #0b1220cc; border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 3px 14px; font-size: 13px; cursor: pointer; }
-.at-up-pill:hover { border-color: var(--accent); color: var(--accent); }
 
 .at-backdrop { position: absolute; border-radius: 50%; background-size: cover; background-position: center; opacity: .5; pointer-events: none;
   -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 72%); mask-image: radial-gradient(circle, #000 55%, transparent 72%); }
@@ -321,3 +318,14 @@ body.at-reveal .at-blur-tag { display: none; }
 .at-crumb:not(.on) { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .at-crumb.on { flex: none; }
 .at-sep { flex: none; }
+
+/* ruler levels are buttons */
+button.at-tick { background: none; border: 0; padding: 3px 0; font: inherit; font-size: 11px; cursor: pointer; pointer-events: auto; text-align: left; }
+button.at-tick:hover { color: var(--accent); }
+button.at-tick:hover i { background: var(--accent); }
+.at-tick.here { color: var(--accent); font-weight: 600; cursor: default; }
+/* discreet "(me)" and picture hint */
+.at-node.discreet .at-label { font-weight: 400; color: #aab5cc; text-shadow: none; font-size: 12px !important; }
+.at-node.discreet .at-caption { font-size: 11px; opacity: .8; }
+.at-badge { background: transparent; border: 0; padding: 0; color: var(--muted); opacity: .75; display: inline-flex; align-items: center; gap: 6px; }
+.at-badge .at-pic { display: inline-flex; }
