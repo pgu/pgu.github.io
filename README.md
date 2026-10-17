@@ -44,7 +44,8 @@ Because the cards are pixels on a 2D canvas, effects that need access to the ren
 - **Save as image.** The toolbar button copies the canvas to a second one, adds a credit line and calls `toBlob`. The PNG shows the real HTML (fonts, CSS, layout) as the browser rendered it, with no screenshot library. In Chrome 155 `toBlob` and `getImageData` work on canvases containing drawn elements.
 - **Floor reflection.** After the cards are drawn, the strip just above the axis is copied (`drawImage` from the canvas itself) into a small offscreen canvas, flipped, faded with a `destination-in` gradient and drawn back below the cards. One extra bitmap copy per frame, no extra DOM rendering.
 - **Motion trails.** `ctx.reset()` clears the canvas each frame, so the dock area of the previous frame is copied out first and drawn under the new frame at 55% opacity. Cards that move (dock magnification) leave a short fading ghost. This is a feedback buffer: CSS has no equivalent. It is disabled under `prefers-reduced-motion`.
-- Both effects have a checkbox in the toolbar so they can be compared on and off.
+- **RGB split and glitch on open.** When the genie lands, the expanded panel is copied out of the canvas and rebuilt as three colour channels: the copy is multiplied by pure red, green and blue (`globalCompositeOperation = 'multiply'`) and the three layers are drawn back with additive blending (`'lighter'`) at slightly different horizontal offsets. At zero offset the sum is the original panel, so the effect starts wide, with a few frames of horizontally shifted bands (glitch), and decays to nothing in about half a second, leaving the text clean. It is only possible because the DOM panel exists as pixels.
+- All three effects have a checkbox in the toolbar so they can be compared on and off.
 
 ### Gotchas found while building it
 

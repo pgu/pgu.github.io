@@ -28,8 +28,9 @@
   var mouse = null;           // {x, y} in canvas CSS px, or null
   var sel = -1, morphIdx = -1, morphT = 0, morphTarget = 0;
   var shiftCur = 0, mxCur = 0, last = 0;
-  var fx = { refl: true, trails: true };             // effects only possible because the cards are pixels on a canvas
+  var fx = { refl: true, trails: true, glitch: true };             // effects only possible because the cards are pixels on a canvas
   var TRAIL = .55, REFL_H = 46, REFL_A = .3;
+  var rgbSrc, rgbCh, glitchAt = 0;                   // RGB split of the expanded panel: scratch canvases, start time
   var trailOk = false, trailCv, trailCtx, reflCv, reflCtx;            // previous frame (dock area) and a mirrored strip
   var snap, snapCtx, snapDirty = true;   // bitmap copy of the detail panel, so genie strips are cheap drawImage calls
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -219,7 +220,7 @@
     save.title = 'Download what you see as a PNG: real HTML rendered by the browser, no screenshot library';
     save.addEventListener('click', saveImage);
     bar.appendChild(save);
-    [['refl', 'Reflection'], ['trails', 'Motion trails']].forEach(function (d) {
+    [['refl', 'Reflection'], ['trails', 'Motion trails'], ['glitch', 'Glitch on open']].forEach(function (d) {
       var lab = el('label', 'cv-fx'), cb = el('input');
       cb.type = 'checkbox'; cb.checked = fx[d[0]];
       cb.addEventListener('change', function () { fx[d[0]] = cb.checked; if (cv) cv.requestPaint(); });
@@ -278,7 +279,7 @@
   function select(i) {
     sel = i;
     if (i >= 0) {
-      morphIdx = i; morphT = reduced ? 1 : 0; morphTarget = 1;
+      morphIdx = i; morphT = reduced ? 1 : 0; morphTarget = 1; glitchAt = 0;
       buildDetail(items[i].job, items[i].hue);
       snapDirty = true;
     } else morphTarget = 0;
@@ -328,6 +329,47 @@
       var sh = snap.height / N;
       ctx.drawImage(snap, 0, k * sh, snap.width, sh, cxs - w / 2, y0, w, Math.max(.5, y1 - y0) + .75);
     }
+  }
+
+  // Chromatic aberration + short glitch, played once on the panel when the genie lands.
+  // The panel is already pixels on the canvas, so: copy its rectangle, then rebuild it as three colour channels
+  // (multiply by pure red / green / blue), drawn with additive blending at slightly different offsets.
+  // At offset 0 the sum is exactly the original panel; the effect ends there, so the text is left untouched.
+  var CH = [['#f00', -1], ['#0f0', 0], ['#00f', 1]];
+  function rgbSplit(rx, ry, dw, dh, amp, glitch) {
+    var m = 24, x0 = Math.max(0, Math.floor(rx - m)), y0 = Math.max(0, Math.floor(ry - m));
+    var x1 = Math.min(W, Math.ceil(rx + dw + m)), y1 = Math.min(H, Math.ceil(ry + dh + m));
+    var sx = Math.round(x0 * dpr), sy = Math.round(y0 * dpr), sw = Math.round((x1 - x0) * dpr), sh = Math.round((y1 - y0) * dpr);
+    if (sw < 4 || sh < 4) return;
+    rgbSrc = rgbSrc || document.createElement('canvas'); rgbCh = rgbCh || document.createElement('canvas');
+    if (rgbSrc.width !== sw || rgbSrc.height !== sh) { rgbSrc.width = rgbCh.width = sw; rgbSrc.height = rgbCh.height = sh; }
+    var sc = rgbSrc.getContext('2d'), cc = rgbCh.getContext('2d');
+    sc.clearRect(0, 0, sw, sh); sc.drawImage(cv, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    // glitch: horizontal bands shifted sideways for a few frames
+    var bands = glitch ? 9 : 1, bh = Math.ceil(sh / bands), shift = [];
+    for (var b = 0; b < bands; b++) shift.push(glitch ? Math.round((Math.random() - .5) * 2 * 12 * dpr * glitch) : 0);
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // only the inner part is rewritten: the copied margin is wider than any shift, so every channel still has pixels
+    // to shift in at the edges (otherwise a one-pixel coloured line shows along the border of the copied area)
+    var inset = Math.round(16 * dpr);
+    ctx.beginPath(); ctx.rect(sx + inset, sy + inset, sw - 2 * inset, sh - 2 * inset); ctx.clip();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#000'; ctx.fillRect(sx, sy, sw, sh);
+    ctx.globalCompositeOperation = 'lighter';
+    CH.forEach(function (c) {
+      cc.globalCompositeOperation = 'source-over';
+      cc.clearRect(0, 0, sw, sh); cc.drawImage(rgbSrc, 0, 0);
+      cc.globalCompositeOperation = 'multiply'; cc.fillStyle = c[0]; cc.fillRect(0, 0, sw, sh);   // keep one channel
+      var dx = Math.round(c[1] * amp * dpr);
+      for (var b = 0; b < bands; b++) {
+        var by = b * bh, hh = Math.min(bh, sh - by);
+        if (hh > 0) ctx.drawImage(rgbCh, 0, by, sw, hh, sx + dx + shift[b], sy + by, sw, hh);
+      }
+    });
+    ctx.restore();
   }
 
   function paint(e) {
@@ -488,6 +530,15 @@
         if (t && t.toString) detailEl.style.transform = t.toString();
       }
       ctx.restore();
+      // once the genie has landed: a brief RGB split + glitch on the panel, then back to a clean picture
+      if (morphT >= 1 && morphTarget === 1 && fx.glitch && !reduced) {
+        if (!glitchAt) glitchAt = now;
+        var age = (now - glitchAt) / 1000;
+        if (age < .55) {
+          rgbSplit(mainRect.x, mainRect.y, mainRect.w, mainRect.h, 7 * Math.exp(-age * 7), age < .3 ? 1 - age / .3 : 0);
+          busy = true;
+        }
+      }
       live = morphT === 1 && morphTarget === 1;
     }
     detailEl.classList.toggle('live', live);
