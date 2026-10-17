@@ -47,6 +47,21 @@ Because the cards are pixels on a 2D canvas, effects that need access to the ren
 - **RGB split and glitch on open.** When the genie lands, the expanded panel is copied out of the canvas and rebuilt as three colour channels: the copy is multiplied by pure red, green and blue (`globalCompositeOperation = 'multiply'`) and the three layers are drawn back with additive blending (`'lighter'`) at slightly different horizontal offsets. At zero offset the sum is the original panel, so the effect starts wide, with a few frames of horizontally shifted bands (glitch), and decays to nothing in about half a second, leaving the text clean. It is only possible because the DOM panel exists as pixels.
 - All three effects have a checkbox in the toolbar so they can be compared on and off.
 
+### Atlas on canvas (second view, `#atlas-canvas`)
+
+The same Atlas (same tree, same layout, same node markup) drawn on one canvas, next to the plain HTML/CSS Atlas, which stays as it is. Code: [js/atlas-canvas.js](js/atlas-canvas.js); the model and the node builder are shared through `window.AtlasCore` (exported by [js/atlas.js](js/atlas.js)), the "needs HTML-in-Canvas" panel through `window.H2C` (exported by [js/canvas.js](js/canvas.js)).
+
+- **What is real DOM:** every circle (`Core.buildNode(item, geometry, bare)` builds the same element as the HTML Atlas, without listeners) and the level's backdrop picture are children of the `<canvas layoutsubtree>`, laid out by the browser and painted with `drawElementImage` under the same camera maths as the CSS version.
+- **What only the canvas can do:**
+  - a **starfield** that streams outward as you zoom in and inward as you zoom out (streaks proportional to the zoom speed);
+  - **depth of field**: during a zoom the level you leave blurs while the one you enter comes into focus (`ctx.filter = 'blur()'` applied to the drawn DOM);
+  - **additive glow**, a breathing ring and a pulse on the circle you jumped to (`globalCompositeOperation = 'lighter'`);
+  - **cross-link arcs**: hover a circle and its links are drawn as glowing, animated dashed curves, to another circle of the level or to a clickable chip on the right for links that leave it. The chips have a short grace period so the pointer can reach them;
+  - the depth ruler, the centre title, the way-up button and the chips are canvas text with hand-made hit areas, because Chrome 155 does not hit-test the canvas children.
+- **Same behaviour as the HTML Atlas:** click to zoom in, wheel / pinch to scrub the zoom, Esc to zoom out, breadcrumb, side panel with pictures, blur of licensed pictures and its Konami-code toggle (one shared state across both views), fly-in from the Universe on first open.
+- **Small circles** keep their label underneath, outside the element's box, so the label is drawn as canvas text.
+- Falls back to the instructions panel, as the canvas timeline does.
+
 ### Gotchas found while building it
 
 - Snapshots are device-pixel sized: with `ctx.scale(devicePixelRatio)` an element drawn with just `(el, x, y)` appears `dpr` times too large. Always pass a destination width and height.

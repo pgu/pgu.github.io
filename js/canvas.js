@@ -61,10 +61,7 @@
     return { name: 'this browser', chromium: false };
   }
 
-  function showFallback(err) {
-    stage.hidden = true;
-    note.textContent = '';
-    fallbackEl.hidden = false;
+  function renderFallback(fallbackEl, err, altHref, altLabel) {
     fallbackEl.textContent = '';
     var b = browser();
     fallbackEl.appendChild(el('h2', null, 'This view needs HTML-in-Canvas'));
@@ -97,13 +94,20 @@
     }
     var p = el('p');
     p.appendChild(document.createTextNode('Meanwhile: '));
-    var a = el('a', null, 'regular timeline'); a.href = '#timeline';
+    var a = el('a', null, altLabel || 'regular timeline'); a.href = altHref || '#timeline';
     p.appendChild(a);
     p.appendChild(document.createTextNode(' · '));
     var spec = el('a', null, 'about the proposal'); spec.href = 'https://github.com/WICG/html-in-canvas'; spec.target = '_blank'; spec.rel = 'noopener';
     p.appendChild(spec);
     fallbackEl.appendChild(p);
   }
+  function showFallback(err) {
+    stage.hidden = true;
+    note.textContent = '';
+    fallbackEl.hidden = false;
+    renderFallback(fallbackEl, err);
+  }
+
 
   /* ---------- build ---------- */
   function yearsLabel(j) {
@@ -573,6 +577,7 @@
       try { start(); } catch (err) { failed = true; showFallback(err && err.message || err); }
     } else cv.requestPaint();
   }
+  window.H2C = { hasApi: hasApi, renderFallback: renderFallback };   // shared with the Atlas canvas view
   window.addEventListener('viewchange', function (e) { if (e.detail === 'canvas') show(); });
   if (location.hash === '#canvas') show();
 })();

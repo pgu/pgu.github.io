@@ -29,6 +29,7 @@
     <a href="#geo" role="tab" data-view="geo">Map</a>
     <a href="#game" role="tab" data-view="game">Keyword rain</a>
     <a href="#atlas" role="tab" data-view="atlas">Atlas</a>
+    <a href="#atlas-canvas" role="tab" data-view="atlas-canvas">Atlas on canvas <span class="badge">experimental</span></a>
     <a href="#canvas" role="tab" data-view="canvas">Canvas timeline <span class="badge">experimental</span></a>
   </nav>
 
@@ -94,7 +95,7 @@
     <section id="view-atlas" class="view" hidden>
       <div class="at-bar">
         <div id="at-crumbs" class="at-crumbs"></div>
-        <label class="at-toggle" id="at-blur-wrap" hidden title="Pictures from licensed sources (Gartner, BARC, Forrester) are blurred by default"><input type="checkbox" id="at-blur" checked> Blur restricted images</label>
+        <label class="at-toggle js-blur-wrap" hidden title="Pictures from licensed sources (Gartner, BARC, Forrester) are blurred by default"><input type="checkbox" class="js-blur" checked> Blur restricted images</label>
         <button id="at-out" class="link-btn">⤴ Zoom out (Esc)</button>
       </div>
       <div class="at-layout">
@@ -104,6 +105,24 @@
         <aside id="at-panel" class="at-panel"></aside>
       </div>
       <p class="geo-note">Click a node (or scroll / pinch over it) to zoom in; scroll out, Esc or the breadcrumb to zoom back. Dashed curves are cross-links between topics.</p>
+    </section>
+
+    <section id="view-atlas-canvas" class="view" hidden>
+      <div id="ac-fallback" class="cv-fallback" hidden></div>
+      <div id="ac-main" hidden>
+        <div class="at-bar">
+          <div id="ac-crumbs" class="at-crumbs"></div>
+          <label class="at-toggle"><input type="checkbox" id="ac-fx-stars" checked> Star warp</label>
+          <label class="at-toggle"><input type="checkbox" id="ac-fx-dof" checked> Depth of field</label>
+          <label class="at-toggle js-blur-wrap" hidden title="Pictures from licensed sources (Gartner, BARC, Forrester) are blurred by default"><input type="checkbox" class="js-blur" checked> Blur restricted images</label>
+          <button id="ac-out" class="link-btn">⤴ Zoom out (Esc)</button>
+        </div>
+        <div class="at-layout">
+          <div id="ac-stage" class="ac-stage"></div>
+          <aside id="ac-panel" class="at-panel"></aside>
+        </div>
+        <p class="geo-note" id="ac-note">Experimental: the same Atlas, drawn on one canvas. Every circle is a real DOM element painted with drawElementImage(); the starfield, depth of field, glow and link arcs are canvas effects. Hover a circle to see its cross-links, click to zoom in, scroll to scrub the zoom, Esc to zoom out.</p>
+      </div>
     </section>
 
     <section id="view-canvas" class="view" hidden>
@@ -125,5 +144,6 @@
   <script src="js/atlas-data.js"></script>
   <script src="js/atlas.js"></script>
   <script src="js/canvas.js"></script>
+  <script src="js/atlas-canvas.js"></script>
 </body>
 </html>

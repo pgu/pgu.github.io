@@ -100,8 +100,8 @@
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function svgEl(tag, attrs) { var e = document.createElementNS(SVG, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
 
-  function buildNode(item) {
-    var n = byId[item.id], p = px(item), kids = hasKids(n.id);
+  function buildNode(item, pxf, bare) {      // pxf: optional geometry; bare: no listeners (used by the canvas renderer)
+    var n = byId[item.id], p = (pxf || px)(item), kids = hasKids(n.id);
     var e = el('div', 'at-node ' + (kids ? 'has-kids' : 'leaf'));
     e.dataset.id = n.id;
     e.style.left = (p.x - p.r) + 'px'; e.style.top = (p.y - p.r) + 'px';
@@ -132,9 +132,11 @@
       badge.appendChild(ic);
       e.appendChild(badge);
     }
-    e.addEventListener('click', function () { onNode(n.id); });
-    e.addEventListener('mouseenter', function () { showInfo(n.id); });
-    e.addEventListener('mouseleave', function () { showInfo(null); });
+    if (!bare) {
+      e.addEventListener('click', function () { onNode(n.id); });
+      e.addEventListener('mouseenter', function () { showInfo(n.id); });
+      e.addEventListener('mouseleave', function () { showInfo(null); });
+    }
     return e;
   }
 
@@ -343,9 +345,9 @@
   }
 
   document.addEventListener('keydown', function (e) {
-    if (location.hash !== '#atlas') return;
+    if (location.hash !== '#atlas' && location.hash !== '#atlas-canvas') return;
     if (!lb.hidden) { if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); } return; }
-    if (busy || animating) return;
+    if (location.hash !== '#atlas' || busy || animating) return;
     if (e.key === 'Escape' || e.key === 'Backspace') { e.preventDefault(); zoomOut(); }
   });
   stage.addEventListener('click', function (e) {
@@ -407,23 +409,25 @@
   function caption(im) { return im.title + (im.credit ? ' — ' + im.credit : ''); }
   // Restricted pictures are blurred by default. The toggle that lifts the blur stays hidden until the Konami code is
   // typed on this view; nothing is remembered between visits, so every visitor starts blurred.
-  var blurBox = document.getElementById('at-blur'), blurWrap = document.getElementById('at-blur-wrap');
+  var blurBoxes = [].slice.call(document.querySelectorAll('.js-blur')), blurWraps = [].slice.call(document.querySelectorAll('.js-blur-wrap'));
   try { localStorage.removeItem('pgu-atlas-blur'); } catch (e) {}      // drop the old remembered choice
-  function applyBlur() { document.body.classList.toggle('at-reveal', !blurBox.checked); }
-  blurBox.addEventListener('change', applyBlur);
+  function applyBlur() { document.body.classList.toggle('at-reveal', !blurBoxes[0].checked); }
+  blurBoxes.forEach(function (b) {
+    b.addEventListener('change', function () { blurBoxes.forEach(function (x) { x.checked = b.checked; }); applyBlur(); });
+  });
   applyBlur();
 
   var KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'], kpos = 0;
   document.addEventListener('keydown', function (e) {
-    if (location.hash !== '#atlas' || e.ctrlKey || e.metaKey || e.altKey) return;
+    if ((location.hash !== '#atlas' && location.hash !== '#atlas-canvas') || e.ctrlKey || e.metaKey || e.altKey) return;
     var k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (k === KONAMI[kpos]) kpos++;
     else kpos = (k === KONAMI[0]) ? 1 : 0;
     if (kpos === KONAMI.length) {
       kpos = 0;
-      blurWrap.hidden = !blurWrap.hidden;         // typing it again hides the toggle (and puts the blur back)
-      if (blurWrap.hidden) { blurBox.checked = true; applyBlur(); }
-      else { blurWrap.classList.remove('konami'); void blurWrap.offsetWidth; blurWrap.classList.add('konami'); }
+      var show = blurWraps[0].hidden;               // typing it again hides the toggle (and puts the blur back)
+      blurWraps.forEach(function (w) { w.hidden = !show; if (show) { w.classList.remove('konami'); void w.offsetWidth; w.classList.add('konami'); } });
+      if (!show) { blurBoxes.forEach(function (b) { b.checked = true; }); applyBlur(); }
     }
   });
 
@@ -553,4 +557,12 @@
   new ResizeObserver(function () { if (stage.clientWidth && (stage.clientWidth !== W || stage.clientHeight !== H)) build(); }).observe(stage);
   window.addEventListener('viewchange', function (e) { if (e.detail === 'atlas') build(); });
   if (location.hash === '#atlas') build();
+
+  // shared with the canvas renderer (atlas-canvas.js): same tree, same layout, same node markup
+  window.AtlasCore = {
+    D: D, byId: byId, parent: parent, depthOf: depthOf, maxDepth: maxDepth, START: START, titleCount: titleCount,
+    hasKids: hasKids, pathTo: pathTo, childOfAncestor: childOfAncestor, inSubtree: inSubtree, layoutOf: layoutOf,
+    setPicture: setPicture, buildNode: buildNode, gallery: gallery, el: el, caption: caption,
+    lightboxOpen: function () { return !lb.hidden; }
+  };
 })();
