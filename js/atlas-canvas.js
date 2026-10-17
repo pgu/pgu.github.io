@@ -20,7 +20,8 @@
   var cur = D.root.id, trans = null, busy = false, animating = false, raf = 0, settleTimer = 0;
   var layers = {};                 // id -> { nodes: [{id, item, el}], bd: backdrop element | null }
   var hits = [], chips = [], uiHits = [];   // hit areas of the last frame (nodes, link chips, canvas-drawn buttons)
-  var mouse = null, hoverId = null, focusId = null, leaveT = 0, selected = null, backTo = null;
+  var mouse = null, hoverId = null, focusId = null, pendingId = null, pendingT = 0, selected = null, backTo = null;
+  var SWITCH_MS = 220;              // dwell needed on another circle before the links switch to it
   var pulse = null;                // { id, t0 }: ring around the node we just jumped to
   var stars = [], phase = 0, prevPhase = 0, last = 0;
 
@@ -187,8 +188,13 @@
     vg.addColorStop(0, 'rgba(4,8,18,0)'); vg.addColorStop(1, 'rgba(4,8,18,.55)');
     ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
 
-    // leaving a circle: keep its links for a moment so the pointer can reach a chip
-    if (!mouseOverChip() && !hoverId && focusId && leaveT && now - leaveT > 380) { focusId = null; leaveT = 0; chips = []; panelFor(); }
+    // links stay on the focused circle (no timeout) so the pointer can travel to a chip; they only move to another circle
+    // after a short dwell on it, so sweeping across neighbours on the way does not steal them
+    if (pendingId) {
+      if (hoverId !== pendingId) pendingId = null;
+      else if (now - pendingT > SWITCH_MS) { focusId = pendingId; pendingId = null; panelFor(); }
+      else needFrame = true;
+    }
     if (needFrame && !document.hidden) cv.requestPaint();
   }
 
@@ -231,7 +237,6 @@
   }
   function fit(text, maxW) { if (ctx.measureText(text).width <= maxW) return text; while (text.length > 2 && ctx.measureText(text + '…').width > maxW) text = text.slice(0, -1); return text + '…'; }
   function roundRect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
-  function mouseOverChip() { return !!(mouse && chips.some(function (c) { return mouse.x >= c.x && mouse.x <= c.x + c.w && mouse.y >= c.y && mouse.y <= c.y + c.h; })); }
 
   // title of the level in the hole of the ring, and the way up (both drawn on the canvas, both clickable)
   function drawCenter() {
@@ -290,7 +295,7 @@
   function finish() {
     if (!trans) return;
     cur = trans.t >= .5 ? trans.c : trans.p;
-    trans = null; selected = null; focusId = null; chips = [];
+    trans = null; selected = null; focusId = null; pendingId = null; chips = [];
     if (backTo && cur === backTo.id) backTo = null;
     setLayers([cur]); updateUI(); cv.requestPaint();
   }
@@ -397,12 +402,15 @@
       if (trans || busy) { cv.requestPaint(); return; }
       var n = nodeAt(mouse), ui = uiAt(mouse), chip = chipAt(mouse);
       hoverId = n ? n.id : null;
-      if (n) { if (focusId !== n.id) { focusId = n.id; panelFor(); } leaveT = 0; }
-      else if (focusId && !chip && !leaveT) leaveT = performance.now();
+      if (n) {
+        if (!focusId) { focusId = n.id; pendingId = null; panelFor(); }                    // first circle: links appear at once
+        else if (n.id !== focusId) { if (pendingId !== n.id) { pendingId = n.id; pendingT = performance.now(); } }
+        else pendingId = null;
+      } else pendingId = null;
       cv.style.cursor = (n && (hasKids(n.id) || true)) || ui || chip ? 'pointer' : '';
       cv.requestPaint();
     });
-    cv.addEventListener('pointerleave', function () { mouse = null; hoverId = null; if (focusId) leaveT = performance.now(); cv.requestPaint(); });
+    cv.addEventListener('pointerleave', function () { mouse = null; hoverId = null; pendingId = null; cv.requestPaint(); });   // the focused circle keeps its links: the side panel lists them too
     cv.addEventListener('click', function (e) {
       if (trans || busy || animating) return;
       var p = local(e), chip = chipAt(p);
@@ -416,7 +424,7 @@
       }
       var n = nodeAt(p);
       if (n) { if (hasKids(n.id)) zoomIn(n.id); else { selected = n.id; shownPanel = null; panelFor(); pulse = { id: n.id, t0: performance.now() }; cv.requestPaint(); } }
-      else if (selected) { selected = null; shownPanel = null; panelFor(); cv.requestPaint(); }
+      else { selected = null; focusId = null; pendingId = null; chips = []; shownPanel = null; panelFor(); cv.requestPaint(); }   // click on empty space: let go
     });
     // wheel / pinch: scrub the zoom, then settle on the nearest level
     cv.addEventListener('wheel', function (e) {
