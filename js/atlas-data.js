@@ -263,8 +263,9 @@
             sq('web-apis', 'Web APIs')
           ], { images: [pic('11-01-browser.jpg', 'What happens when you enter a URL in the browser', '© ByteByteGo')] }),
           n('web-specs', 'Specs evolution', [
-            sq('ecmascript', 'ECMAScript'), sq('html-css-a11y', 'HTML, CSS and accessibility'), n('browser-support', 'Browser support differences', [], { images: [pic('11-09-caniuse.jpg', 'Can I use: CSS Grid Layout browser support', 'Can I use (caniuse.com)')] })
-          ]),
+            sq('ecmascript', 'ECMAScript'), sq('html-css-a11y', 'HTML, CSS, a11y and i18n'), n('browser-support', 'Browser support differences', [], { images: [pic('11-09-caniuse.jpg', 'Can I use: CSS Grid Layout browser support', 'Can I use (caniuse.com)')] })
+          ], { images: [
+            pic('11-16-front-evol.jpg', 'Frontend evolution, 1995-2019: HTML, CSS and JavaScript ecosystems', 'ManzDev, Frontend Evolution (github.com/ManzDev/frontend-evolution)')] }),
           n('js-eco', 'JS ecosystem', [
             n('js-frameworks', 'Frameworks', [sq('react', 'React'), sq('angularjs', 'AngularJS'), sq('gwt', 'GWT')]),
             n('js-tooling', 'Tooling and build tools', [sq('nodejs', 'Node.js'), sq('webpack', 'Webpack')]),
@@ -380,7 +381,7 @@
       'Data mesh', 'Landscape', 'Weights', 'Honorable'],
     'product-mgmt': ['TAM', 'SAM', 'SOM', 'Kano', 'Jobs to be Done', 'Double Diamond', 'Discovery', 'Segmentation', 'Benchmarking',
       'Value effort', 'SEQ', 'SUS', 'CSAT', 'NPS', 'Pirate metrics'],
-    'product-dev': ['Heuristics', 'Typography', 'Accessibility', 'Taxonomies', 'Aesthetic', 'Validation', 'Optimistic', 'Prefetch',
+    'product-dev': ['Heuristics', 'Typography', 'Accessibility', 'a11y', 'i18n', 'Taxonomies', 'Aesthetic', 'Validation', 'Optimistic', 'Prefetch',
       'Collections', 'OSI']
   };
 
