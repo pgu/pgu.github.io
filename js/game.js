@@ -13,19 +13,37 @@
 
   function norm(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
-  // Build the word pool from every keyword in the profile.
-  var pool = (function () {
+  // Build the word pool from every keyword in the profile (job tech + extras) and from the Atlas
+  // (node titles and a curated word list per area). Built on first use, so script order does not matter.
+  var SKIP = ['The industry', 'The company', 'Company map', 'Our offering', 'How to read it', 'Sources', 'Inputs', 'Content',
+    'Foundations', 'Presentation', 'Interaction', 'Specs evolution', 'JS ecosystem', 'CSS ecosystem', 'Java ecosystem',
+    'Frameworks', 'Methods', 'Size', 'Scale', 'Balance', 'Main user goal', 'Key steps', 'Entry point', 'First use', 'No results',
+    'Market', 'Customers', 'Market overview'];
+  var pool = null;
+  function buildPool() {
     var seen = {}, out = [];
-    function add(w) {
+    function add(w, color) {
       var k = norm(w);
-      if (k.length < 2 || k.length > 14 || seen[k]) return;
+      if (k.length < 2 || k.length > 16 || seen[k]) return;      // long words only show up at higher levels (see spawn)
       seen[k] = 1;
-      out.push({ text: w, key: k, color: COLOR[CAT[w] || 'Other'] });
+      out.push({ text: w, key: k, color: color });
     }
-    window.JOBS.forEach(function (j) { j.tech.forEach(add); });
-    window.EXTRA_KEYWORDS.forEach(add);
+    window.JOBS.forEach(function (j) { j.tech.forEach(function (w) { if (norm(w).length <= 14) add(w, COLOR[CAT[w] || 'Other']); }); });
+    window.EXTRA_KEYWORDS.forEach(function (w) { if (norm(w).length <= 14) add(w, COLOR.Other); });
+    var A = window.ATLAS;
+    if (A) {
+      (function walk(node, depth, hue) {
+        hue = node.hue != null ? node.hue : hue;
+        var color = 'hsl(' + hue + ' 70% 62%)';
+        if (depth >= 5 && SKIP.indexOf(node.title) < 0) add(node.title, color);     // below "(me)" only: no cosmic levels
+        (A.keywords && A.keywords[node.id] || []).forEach(function (w) { add(w, color); });
+        node.children.forEach(function (c) { walk(c, depth + 1, hue); });
+      })(A.root, 0, 265);
+    }
     return out;
-  })();
+  }
+  function getPool() { return pool || (pool = buildPool()); }
+  function maxLen(level) { return Math.min(16, 4 + level * 2); }      // level 1: 6 letters, 2: 8, 3: 10 ... level 6+: 16
 
   var HISTORY_KEY = 'pgu-keyword-history', HISTORY_MAX = 100;
   var history = [];
@@ -58,12 +76,12 @@
   }
 
   function spawn() {
-    var w = pool[Math.floor(Math.random() * pool.length)];
-    // avoid duplicates on screen
-    for (var tries = 0; tries < 10 && words.some(function (x) { return x.key === w.key; }); tries++) {
-      w = pool[Math.floor(Math.random() * pool.length)];
-    }
-    if (words.some(function (x) { return x.key === w.key; })) return;
+    var P = getPool(), cap = maxLen(level), w;
+    function pick() { return P[Math.floor(Math.random() * P.length)]; }
+    w = pick();
+    // avoid duplicates on screen, and words too long for the current level
+    for (var tries = 0; tries < 20 && (w.key.length > cap || words.some(function (x) { return x.key === w.key; })); tries++) w = pick();
+    if (w.key.length > cap || words.some(function (x) { return x.key === w.key; })) return;
     var node = document.createElement('div');
     node.className = 'fw';
     node.style.setProperty('--c', w.color);

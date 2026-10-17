@@ -1,0 +1,388 @@
+// Content for the "Atlas" view: a containment tree (zoom into a node to see its children)
+// plus cross-links (graph edges between nodes of different branches).
+// Sample content, to be completed and refined. Optional per node later: image, text, animation.
+(function () {
+  function n(id, title, children, extra) {
+    var o = { id: id, title: title, children: children || [] };
+    if (extra) for (var k in extra) o[k] = extra[k];
+    return o;
+  }
+
+  // Pictures that illustrate a node (shown in the side panel, click to enlarge). Web-sized copies of the files in
+  // pictures-for-atlas-context/. Credits are what the pictures themselves show; fill in the missing authors.
+  var IMG = 'pictures/atlas/content/';
+  // Pictures credited to Gartner, BARC or Forrester (licensed analyst content): they are blurred by default (a toggle in the Atlas reveals them).
+  function pic(file, title, credit) { return { src: IMG + file, title: title, credit: credit || '', blur: /gartner|barc|forrester/i.test(credit || '') }; }
+  function sq(id, title, caption) { return n(id, title, [], caption ? { caption: caption } : null); }   // a plain leaf
+
+  var me = n('me', '(me)', [
+    n('customers', 'Understanding customers', [
+      n('porter5', 'The industry', [], { caption: 'Porter\'s five forces', images: [
+        pic('c-00-porter-five-forces.jpg', 'Porter\'s five forces model', 'Michael E. Porter\'s model (diagram source unknown)')] }),
+      n('company', 'The company', [], { caption: 'Porter\'s value chain', images: [
+        pic('c-01-porter-value-chain.jpg', 'Porter\'s value chain: primary and support activities, margin', 'Michael E. Porter\'s model (diagram source unknown)')] }),
+      n('togaf', 'Enterprise architecture (TOGAF)', [
+        n('business-arch', 'Business architecture'),
+        n('data-arch', 'Data architecture'),
+        n('app-arch', 'Applications architecture'),
+        n('tech-arch', 'Technology architecture')
+      ], { images: [
+        pic('c-02-togaf.jpg', 'The TOGAF architecture development method (ADM): business, application and technology layers', '© The Open Group, TOGAF® Specification')] }),
+      n('data-in-practice', 'Data stack in practice', [], { caption: 'personas along the stack', images: [
+        pic('c-04-life-data.jpg', 'Life of a data: from creation to deletion (ingestion, validation, replication, ETL vs ELT, lineage, tiers)', '© ByteByteGo'),
+        pic('c-05-data-team.jpg', 'How modern data teams work: architect, engineer, analyst, scientist, BI developer, ML engineer', 'DataWithBaraa, Baraa Khatib Salkini (YouTube: "How Modern Data Teams Work")')] }),
+      n('data-management', 'Data management', [], { caption: 'DAMA', images: [
+        pic('c-03-dama-data-mngt.jpg', 'The DAMA data management framework: data governance around lifecycle management and foundational activities', 'DAMA International (DAMA-DMBOK)')] })
+    ], { hue: 200 }),
+
+    n('market', 'Understanding the market', [
+      n('market-landscape', 'Market landscape', [
+        sq('data-integration', 'Data integration', 'main focus, incl. iPaaS and data quality'),
+        sq('bi-market', 'BI', 'under watch'),
+        sq('ai-market', 'AI', 'under watch'),
+        sq('api-market', 'API management', 'previous focus'),
+        n('analysis-sources', 'Sources', [], { caption: 'analysts, news, blogs, books, vendor updates', images: [
+          pic('m-40-data-eng-book.jpg', 'A reference book: Fundamentals of Data Engineering', '© O\'Reilly, Joe Reis and Matt Housley'),
+          pic('m-41-data-eng-lifecycle.jpg', 'From the book: the data engineering lifecycle and its undercurrents (figure 2-7)', '© O\'Reilly, Joe Reis and Matt Housley'),
+          pic('m-42-mad-landscape.jpg', 'The 2025 MAD (ML, AI & Data) landscape', '© Matt Turck and FirstMark (MAD landscape, 2025)'),
+          pic('m-43-db-select.jpg', 'How to choose the right database?', '© ByteByteGo'),
+          pic('m-44-db-cloud.jpg', 'Cloud database cheat sheet', '© ByteByteGo')] })
+      ]),
+      n('competitor-analysis', 'Competitor analysis', [
+        sq('competitors', 'Competitor products'),
+        sq('competitor-swot', 'Competitor SWOT', 'competitive cards in the app'),
+        n('data-cartography', 'Data management cartography', [], { caption: 'my own app', images: [
+          pic('m-30-data-management-app.jpg', 'Data Management Cartography: the base layout, competitors listed on top', '© Pascal Guilcher (own app)'),
+          pic('m-31-data-management-with-competitors.jpg', 'The same cartography filled in with competitor information (partial view)', '© Pascal Guilcher (own app)')] }),
+        n('our-offering', 'Our offering', [
+          sq('offer-analytics', 'Analytics', 'Qlik Sense'),
+          sq('offer-integration', 'Data integration', 'Talend Studio, big data'),
+          sq('offer-quality', 'Data quality'),
+          sq('offer-catalog', 'Data catalog'),
+          sq('offer-api', 'API services'),
+          sq('offer-cloud', 'Cloud administration'),
+          n('certifications', 'Product certifications', [], { caption: 'how I learned the portfolio', images: [
+            pic('m-50-certificates.jpg', 'Qlik and Talend practitioner certifications (2023)', '© Qlik')] })
+        ], { caption: 'to compare with competitors' })
+      ]),
+      n('analysts', 'Market analysts', [
+        n('analyst-assessments', 'Competitor assessments', [
+          n('magic-quadrants', 'Magic Quadrants', [
+            n('mq-reading', 'How to read it', [], { caption: 'ability to execute × completeness of vision', images: [
+              pic('m-22-mq-reminder.jpg', 'Magic Quadrant: the two axes and what they measure', '© Gartner')] }),
+            n('mq-beyond', 'Beyond the graphic', [
+              sq('mq-market-overview', 'Market overview'),
+              sq('mq-vendors-moves', 'Vendors added and dropped'),
+              sq('honorable-mentions', 'Honorable mentions', 'tomorrow\'s threats')
+            ], { images: [
+              pic('m-26-mq-moves-honorable-mentions_market-overview_vendors-dropped-added.jpg', 'Two editions of the same Magic Quadrant: vendors that moved, were added or dropped', '© Gartner'),
+              pic('m-21-docs-reco.jpg', 'Common mistakes to avoid when using the Magic Quadrant', '© Gartner')] }),
+            n('mq-over-time', 'Follow-up over time', [
+              sq('mq-apim', 'API management'), sq('mq-ipaas', 'iPaaS'), sq('mq-di', 'Data integration'),
+              sq('mq-dq', 'Data quality'), sq('mq-bi', 'BI')
+            ], { images: [pic('m-23-mqs-categories-years.jpg', 'Magic Quadrants of several categories, edition after edition', '© Gartner')] })
+          ]),
+          n('critical-capabilities', 'Critical Capabilities', [
+            n('cc-weights', 'Weights per use case', [], { images: [pic('m-27-cc-weights.jpg', 'Weighting for critical capabilities in use cases', '© Gartner')] }),
+            n('cc-ratings', 'Product ratings per capability', [], { images: [pic('m-28-cc-assess.jpg', 'Product/service rating on critical capabilities', '© Gartner')] }),
+            n('cc-scores', 'Product scores per use case', [], { images: [pic('m-29-cc-uc-assess.jpg', 'Product score in use cases', '© Gartner')] })
+          ], { caption: 'the deep dive companion' }),
+          n('other-comparisons', 'Other analyst reports', [
+            n('barc', 'BARC Score', [], { images: [pic('m-24-barc-scores.jpg', 'BARC Score reports over the years', '© BARC (BARC Score)')] }),
+            n('forrester', 'Forrester Wave', [], { images: [pic('m-25-forrester-waves.jpg', 'The Forrester Wave: several categories', '© Forrester (The Forrester Wave)')] })
+          ])
+        ], { images: [pic('m-20-docs.jpg', 'Gartner proprietary research methodologies', '© Gartner')] }),
+        n('tech-trends', 'Technology trends', [
+          n('personas', 'Personas', [], { images: [
+            pic('m-11-persona-data.jpg', 'Focus on other key personas: the teams', '© Gartner'),
+            pic('m-12-persona-int.jpg', 'Persona: software engineers', '© Gartner')] }),
+          n('persona-architecture', 'Persona × architecture', [], { images: [
+            pic('m-09-integration_persona.jpg', 'Hybrid integration capability framework (role-based user experience)', '© Gartner'),
+            pic('m-10-integration_persona_matrix.jpg', 'Detailed integration capability matrix (persona × capability)', '© Gartner'),
+            pic('m-13-persona-semantic.jpg', 'Introducing knowledge graphs to different personas', '© Gartner')] }),
+          n('trend-architecture', 'Data architecture trends', [
+            n('ref-arch', 'Reference architectures', [], { images: [
+              pic('m-00-data-journey.jpg', 'Data and analytics pipeline: conceptual architecture', '© Gartner'),
+              pic('m-04-data-journey_deep.jpg', 'Reference architecture for data management', '© Gartner'),
+              pic('m-01-data-journey_a16z.jpg', 'Unified data infrastructure (2.0)', '© a16z, Emerging architectures for modern data infrastructure (a16z.com/emerging-architectures-for-modern-data-infrastructure)')] }),
+            n('data-fabric', 'Data fabric', [], { images: [
+              pic('m-06-data-archi_ev2.jpg', 'Technology pillars of data fabric', '© Gartner'),
+              pic('m-08-semantic-layer.jpg', 'Semantic layer powered by a knowledge graph', '© Gartner')] }),
+            n('metadata-trend', 'Metadata', [], { images: [pic('m-07-metadata.jpg', 'Metadata types', '© Eckerson Group')] }),
+            n('data-quality', 'Data quality', [], { images: [pic('m-03-data-journey_dq.jpg', 'Engineering principles for data quality', '© Eckerson Group')] })
+          ], { images: [
+            pic('m-05-data-archi_ev.jpg', 'The evolution of data architecture', '© Gartner'),
+            pic('m-02-data-journey_int.jpg', 'Data-centric integration', '© Gartner')] })
+        ])
+      ])
+    ], { hue: 150 }),
+
+    n('product', 'Product management and development', [
+
+      /* ===================== Product management ===================== */
+      n('product-mgmt', 'Product management', [
+
+        n('discovery', 'Discovery and positioning', [
+          n('pm-customers', 'Customers', [
+            sq('pm-personas', 'Personas'),
+            sq('benefit-tree', 'Benefit tree'),
+            n('user-needs', 'User needs', [], { caption: 'Kano model, Jobs to be Done',
+              images: [pic('10-03-kano-model.jpg', 'User needs (Kano model)', '© Todd Birzer')] }),
+            sq('needs-segmentation', 'Needs-based segmentation'),
+            sq('customer-value', 'Customer value'),
+            n('voc', 'Voice of the customer', [], {
+              images: [pic('10-02-voc.jpg', 'Common Voice of the Customer (VOC) sources', 'source unknown')] })
+          ]),
+          n('pm-market', 'Market', [
+            sq('market-sizing', 'Market sizing', 'TAM, SAM, SOM'),
+            sq('competitive-analysis', 'Competitive benchmarking', 'incl. competitive analysis'),
+            sq('tech-watch', 'Technology watch'),
+            n('pestel', 'PESTEL analysis', [], {
+              images: [pic('10-01-pestel.jpg', 'PESTEL analysis (Product tool #4)', '© Todd Birzer')] })
+          ]),
+          n('positioning', 'Positioning', [
+            sq('differentiation', 'Differentiation'),
+            sq('stp', 'Segmentation, targeting and positioning'),
+            sq('marketing-mix', 'Marketing mix', 'product, place, promotion, price')
+          ])
+        ], { images: [pic('10-04-double-diamond.jpg', 'The Double Diamond: discover, define, develop, deliver', 'Wikipedia (it.wikipedia.org/wiki/Double_Diamond)')] }),
+
+        n('strategy', 'Strategy, prioritization and roadmap', [
+          sq('vision-objectives', 'Vision and objectives'),
+          n('pm-inputs', 'Inputs', [
+            sq('insight', 'Customer, market and competitive insights'),
+            sq('product-analytics', 'Product analytics and metrics tracking'),
+            sq('support-trends', 'Customer support issues and trends')
+          ]),
+          n('prioritization', 'Prioritization', [
+            n('value-effort', 'Value/effort matrix', [], { images: [
+              pic('10-07-value-effort-matrix.jpg', 'Value effort matrix', '© Todd Birzer'),
+              pic('10-06-prio-matrix-gartner.jpg', 'Project prioritization matrix (impact vs effort)', '© Gartner, 2024')] }),
+            n('use-case-prism', 'Use-case prism', [
+              sq('business-value', 'Business value', 'revenue, cost, risks'),
+              sq('feasibility', 'Feasibility', 'complexity, scope, predictability')
+            ], { images: [pic('10-05-usecase-prism-gartner.jpg', 'A sample use-case prism', '© Gartner')] })
+          ]),
+          sq('roadmap', 'Roadmap')
+        ]),
+
+        n('measuring', 'Measuring success', [
+          n('ux-metrics', 'UX metrics', [
+            sq('leading', 'Leading indicators', 'usability issues, task completion rate, SEQ (Single Ease Question)'),
+            sq('lagging', 'Lagging indicators', 'SUS (System Usability Scale), CSAT, NPS (Net Promoter Score)'),
+            n('heart', 'HEART framework', [], {
+              images: [pic('10-10-heart-fw.jpg', 'HEART framework: goals, signals, metrics', 'Google (HEART framework)')] })
+          ], { images: [pic('10-11-ux-measures.jpg', 'UX measures: from leading inputs to lagging outcomes', 'Nielsen Norman Group (NN/g)')] }),
+          n('business-metrics', 'Business metrics', [
+            sq('mau', 'MAU', 'monthly active users'),
+            n('revenue-metrics', 'Revenue metrics', [
+              sq('mrr', 'MRR', 'monthly recurring revenue'), sq('arr', 'ARR', 'annual recurring revenue'),
+              sq('arpu', 'ARPU', 'average revenue per user'), sq('nrr', 'NRR', 'net revenue retention')
+            ]),
+            n('customer-metrics', 'Customer metrics', [
+              sq('ltv', 'LTV', 'customer lifetime value'), sq('churn', 'Churn')
+            ])
+          ], { images: [pic('10-12-saas-metrics.jpg', 'The SaaS product metrics pyramid', '© ProductPlan')] }),
+          n('perception-chain', 'From perception to revenue', [
+            sq('user-perception', 'User perception'), sq('satisfaction', 'Satisfaction'), sq('loyalty', 'Loyalty'),
+            sq('referrals', 'Referrals'), sq('retention', 'Retention'), sq('renewals', 'Renewals'), sq('revenue-out', 'Revenue')
+          ], { seq: true, images: [
+            pic('10-08-ux-rev-chain.jpg', 'The UX-revenue chain model', 'UXmatters (uxmatters.com)'),
+            pic('10-09-ux-to-business.jpg', 'Correlating UX metrics with company KPIs (athenahealth)', 'UXmatters (uxmatters.com)')] }),
+          n('aarrr', 'AARRR', [
+            sq('acquisition', 'Acquisition'), sq('activation', 'Activation'), sq('retention-aarrr', 'Retention'),
+            sq('referral', 'Referral'), sq('revenue-aarrr', 'Revenue')
+          ], { seq: true, caption: 'pirate metrics' })
+        ])
+      ], { images: [pic('10-00-prag-insti-fw.jpg', 'The Pragmatic Framework', '© Pragmatic Institute')] }),
+
+      /* ===================== Product development ===================== */
+      n('product-dev', 'Product development', [
+
+        n('ux-ui', 'UX and UI design', [
+          n('visual-principles', 'Visual design principles', [
+            sq('gestalt', 'Gestalt', 'similarity, continuation, closure'),
+            sq('balance', 'Balance'), sq('scale', 'Scale'), sq('contrast', 'Contrast'),
+            n('visual-hierarchy', 'Visual hierarchy', [
+              sq('vh-size', 'Size'), sq('vh-color', 'Colour'), sq('vh-proximity', 'Proximity'), sq('vh-repetition', 'Repetition')
+            ]),
+            sq('golden-ratio', 'Golden ratio')
+          ], { images: [pic('11-00-visu.jpg', '5 basic visual design principles in UX', 'Nielsen Norman Group (NN/g)')] }),
+          n('usability-laws', 'Usability laws and heuristics', [
+            sq('squint-test', 'Squint test'),
+            sq('jakobs-law', 'Jakob\'s law', 'familiarity'),
+            sq('design-standards', 'Design standards'),
+            n('scan-dont-read', 'Users scan, they don\'t read', [sq('f-z-patterns', 'F-pattern and Z-pattern'), sq('signposts', 'Signposts', 'headings, lists, bold words')]),
+            sq('aesthetic-usability', 'Aesthetic-usability effect'),
+            n('cost-benefit', 'Cost-benefit analysis', [
+              sq('utility', 'Utility', 'expected benefit − expected cost'), sq('interaction-cost', 'Interaction cost'), sq('perceived-value', 'Perceived value')
+            ])
+          ], { images: [
+            pic('11-10-ux-laws_1.jpg', 'Laws of UX (1/2): Aesthetic-usability effect, Jakob\'s law, Law of proximity, ...', 'Laws of UX, Jon Yablonski (lawsofux.com)'),
+            pic('11-11-ux-laws_2.jpg', 'Laws of UX (2/2): Miller\'s law, Pareto principle, Postel\'s law, Tesler\'s law, ...', 'Laws of UX, Jon Yablonski (lawsofux.com)')] }),
+          n('web-page-ux', 'Web page UX', [
+            n('wp-foundations', 'Foundations', [sq('web-standards', 'Web standards'), sq('attracting-attention', 'Attracting attention'), sq('scrolling', 'Scrolling'), sq('how-users-scan', 'How users scan')]),
+            sq('wp-content', 'Content', 'entities, attributes, values, states and actions'),
+            n('wp-layering', 'Priority and layering', [sq('responsive', 'Responsive'), sq('grid', 'Grid')]),
+            n('wp-interaction', 'Interaction', [sq('signifiers', 'Signifiers'), sq('calls-to-action', 'Calls to action')]),
+            n('wp-presentation', 'Presentation', [sq('typography-color', 'Typography and colour'), sq('imagery', 'Imagery')])
+          ]),
+          n('info-arch', 'Information architecture', [
+            sq('findability', 'Findability'), sq('discoverability', 'Discoverability'),
+            sq('organization', 'Organization', 'categories and hierarchies'),
+            sq('labeling', 'Labeling'),
+            n('metadata', 'Metadata', [sq('taxonomies-tags', 'Taxonomies and tags'), sq('ontologies', 'Ontologies')])
+          ]),
+          n('ui-states', 'UI states and flows', [
+            n('happy-path', 'Happy path', [
+              sq('main-goal', 'Main user goal'), sq('entry-point', 'Entry point'), sq('key-steps', 'Key steps'), sq('success-confirmation', 'Success confirmation')
+            ]),
+            n('empty-states', 'Empty states', [
+              sq('first-use', 'First use', 'blank slate'), sq('no-results', 'No results', 'empty search'), sq('cleared-completed', 'Cleared or completed'),
+              sq('empty-cta', 'Call to action'), sq('onboarding-hints', 'Onboarding hints')
+            ]),
+            n('loading-states', 'Loading states', [
+              sq('spinner', 'Spinner'), sq('progress-bar', 'Progress bar'), sq('skeleton-screen', 'Skeleton screen'),
+              sq('optimistic-ui', 'Optimistic UI'), sq('perceived-performance', 'Perceived performance')
+            ]),
+            n('error-states', 'Error states and recovery', [
+              sq('validation-errors', 'Validation errors'), sq('system-errors', 'System errors'), sq('not-found', 'Not found', '404'),
+              sq('offline', 'Offline'), sq('permission-denied', 'Permission denied'), sq('retry-undo', 'Retry and undo'), sq('plain-language', 'Plain-language messages')
+            ]),
+            n('edge-cases', 'Edge cases', [
+              sq('partial-data', 'Partial data'), sq('long-text', 'Very long text'), sq('too-many-items', 'Too many items'), sq('slow-network', 'Slow networks')
+            ])
+          ])
+        ], { images: [
+          pic('11-15-ux-certificate.jpg', 'Certificate in User Experience: Human Mind and Usability, Web Page UX Design, Visual Design Fundamentals, Measuring UX and ROI, Information Architecture', 'Nielsen Norman Group (NN/g), June 2023')] }),
+
+        n('web-platform', 'Browser and web platform', [
+          n('browser', 'Browser', [
+            sq('rendering-engine', 'Rendering engine'),
+            n('js-engine', 'JS engine', [sq('event-loop', 'Event loop'), sq('call-stack', 'Call stack, heap and task queue')]),
+            sq('web-apis', 'Web APIs')
+          ], { images: [pic('11-01-browser.jpg', 'What happens when you enter a URL in the browser', '© ByteByteGo')] }),
+          n('web-specs', 'Specs evolution', [
+            sq('ecmascript', 'ECMAScript'), sq('html-css-a11y', 'HTML, CSS and accessibility'), n('browser-support', 'Browser support differences', [], { images: [pic('11-09-caniuse.jpg', 'Can I use: CSS Grid Layout browser support', 'Can I use (caniuse.com)')] })
+          ]),
+          n('js-eco', 'JS ecosystem', [
+            n('js-frameworks', 'Frameworks', [sq('react', 'React'), sq('angularjs', 'AngularJS'), sq('gwt', 'GWT')]),
+            n('js-tooling', 'Tooling and build tools', [sq('nodejs', 'Node.js'), sq('webpack', 'Webpack')]),
+            n('js-cicd', 'CI/CD', [sq('git-github', 'Git and GitHub', 'pull requests, reviews'), sq('jenkins-js', 'Jenkins')])
+          ], { images: [pic('11-02-js.jpg', 'JavaScript explained', '© ByteByteGo')] }),
+          n('css-eco', 'CSS ecosystem', [sq('bootstrap', 'Bootstrap'), sq('tailwind', 'Tailwind'), sq('sass', 'Sass'), sq('design-tokens', 'Design tokens'), sq('design-system', 'Design system')]),
+          n('frontend-perf', 'Frontend performance', [
+            n('perf-loading', 'Loading', [
+              sq('loading-sequence', 'Loading sequence'), sq('priority-loading', 'Priority-based loading'),
+              sq('prefetching', 'Pre-fetching'), sq('dynamic-imports', 'Dynamic imports')
+            ]),
+            n('perf-bundling', 'Bundling', [
+              sq('code-splitting', 'Code splitting', 'modular architecture'), sq('tree-shaking', 'Tree shaking'), sq('compression', 'Compression')
+            ]),
+            sq('selective-rendering', 'Selective rendering')
+          ], { images: [pic('11-05-frontend-perf.jpg', 'Frontend performance cheatsheet', '© ByteByteGo')] })
+        ]),
+
+        n('api-tech', 'API technologies', [
+          n('http', 'HTTP', [], { caption: 'network, the OSI model', images: [pic('11-08-osi.jpg', 'What is the OSI model', '© ByteByteGo')] }),
+          n('rest', 'REST', [sq('rest-methods', 'Methods'), sq('media-types', 'Media types'), sq('payload', 'Payload'), sq('response-codes', 'Response codes'), sq('rest-security', 'Security')], { images: [
+            pic('11-12-tips-rest-api-design_1.jpg', 'Top 8 tips for RESTful API design', '© ByteByteGo'),
+            pic('11-13-tips-rest-api-design_2.jpg', 'REST API design best practices', '© ByteByteGo')] }),
+          n('api-specs', 'Specs and formats', [
+            n('openapi', 'OpenAPI', [sq('overlays', 'Overlays'), sq('arazzo', 'Arazzo')]),
+            sq('asyncapi', 'AsyncAPI'), sq('graphql', 'GraphQL')
+          ], { images: [
+            pic('11-06-api-mcp-standards.jpg', 'How API standards relate to each other (OpenAPI, AsyncAPI, Arazzo, Overlay, MCP, A2A, ...)', 'API Evangelist (standards.apievangelist.com/relationships)'),
+            pic('11-07-api-std-comp.jpg', 'Vocabulary shared between API standards', 'API Evangelist (standards.apievangelist.com/relationships)')] }),
+          n('api-mgmt', 'API management', [sq('rate-limiting', 'Rate limiting'), sq('authentication', 'Authentication'), sq('dev-portal', 'Documentation and developer portal'), sq('monetization', 'Monetization')])
+        ], { images: [
+          pic('11-03-api.jpg', 'API protocols', '© ByteByteGo and Postman'),
+          pic('11-14-api-roadmap.jpg', 'The ultimate API learning roadmap', '© ByteByteGo')] }),
+
+        n('java-eco', 'Java ecosystem', [
+          n('java-runtime', 'Language and runtime', [
+            sq('java-lang', 'Java language', 'collections'),
+            n('jvm', 'JVM', [], { caption: 'garbage collection', images: [pic('11-04-jvm.jpg', 'How the JVM works', '© ByteByteGo')] })
+          ]),
+          n('java-frameworks', 'Frameworks', [
+            sq('jakarta-ee', 'Jakarta EE', 'formerly J2EE'), sq('spring', 'Spring'), sq('hibernate', 'Hibernate'), sq('restlet', 'Restlet')
+          ]),
+          n('java-build', 'Build and CI/CD', [sq('maven', 'Maven'), sq('jenkins-java', 'Jenkins')])
+        ])
+      ], { hue: 340 })
+    ], { hue: 28 })
+  ], {
+    hue: 265, discreet: true,
+    // one small pin among the city lights, in western France (Nantes), not the centre of the planet
+    pos: { x: -.565, y: -.5, r: .05 },
+    caption: 'one of ~8 billion'
+  });
+
+  // Cosmic levels above "Me": zooming out goes Me > Earth > Solar system > Milky Way > Universe.
+  var milkyWay = n('milky-way', 'Milky Way', [
+    n('solar-system', 'Solar system', [
+      n('earth', 'Earth', [me], {
+        hue: 205, imageZoom: 1.22,
+        // inside the Earth level the backdrop is the planet at night: the city lights are everyone else
+        levelImage: 'pictures/atlas/Earth_at_night_globe.jpg', levelImageZoom: 1.2,
+        levelCredit: 'Earth at night (Africa, Europe and the Middle East), NASA Earth Observatory image by Robert Simmon, Suomi NPP VIIRS data courtesy of NOAA NGDC (public domain)',
+        pos: { x: .06, y: -.56, r: .225 },      // sits exactly over the Earth in the Solar System montage (see imagePos below)
+        image: 'pictures/atlas/The_Earth_seen_from_Apollo_17.jpg',
+        credit: 'The Blue Marble, NASA / Apollo 17 crew (public domain)'
+      })
+    ], {
+      hue: 45, pos: { x: .36, y: .42, r: .13 }, imagePos: '50% 12%',     // the Sun sits about halfway out in the Orion Spur, not at the centre
+      image: 'pictures/atlas/Solar_system.jpg',
+      credit: 'Solar System montage, NASA / JPL (public domain)'
+    })
+  ], {
+    hue: 230, pos: { x: -.28, y: -.3, r: .12 },     // one galaxy among countless others
+    image: 'pictures/atlas/Milky_Way_2010.jpg',
+    credit: 'The Milky Way, artist\'s concept, NASA / JPL-Caltech / R. Hurt (SSC) (public domain)'
+  });
+
+  // Cross-links: proposals to review and correct. Each ends at a node of another branch; the same node can appear in several links.
+  var links = [
+    { a: 'data-arch', b: 'data-cartography', label: 'same domain: data' },
+    { a: 'insight', b: 'customers', label: 'feeds customer understanding' },
+    { a: 'insight', b: 'market', label: 'feeds market understanding' },
+    { a: 'insight', b: 'competitors', label: 'feeds competitor tracking' },
+    { a: 'porter5', b: 'competitors', label: 'competitive rivalry' },
+    { a: 'competitive-analysis', b: 'competitors', label: 'same topic, product view' },
+    { a: 'personas', b: 'pm-personas', label: 'same concept, two sources' },
+    { a: 'pm-personas', b: 'ux-ui', label: 'personas inform UX' },
+    { a: 'magic-quadrants', b: 'competitors', label: 'analysts rank competitors' },
+    { a: 'critical-capabilities', b: 'prioritization', label: 'capability gaps drive priorities' },
+    { a: 'info-arch', b: 'data-cartography', label: 'metadata and taxonomies' },
+    { a: 'api-tech', b: 'analysts', label: 'API market analysis' },
+    { a: 'competitor-swot', b: 'analyst-assessments', label: 'my view vs the analysts\' view' },
+    { a: 'data-in-practice', b: 'personas', label: 'same personas, customer and analyst views' },
+    { a: 'honorable-mentions', b: 'competitors', label: 'today\'s mention, tomorrow\'s competitor' },
+    { a: 'trend-architecture', b: 'data-arch', label: 'same subject, two sources' },
+    { a: 'loading-states', b: 'frontend-perf', label: 'perceived vs real speed' },
+    { a: 'error-states', b: 'response-codes', label: 'the HTTP errors behind the messages' },
+    { a: 'happy-path', b: 'leading', label: 'the metric that tells whether it works' }
+  ];
+
+  // The very top: deep space. One tiny patch of sky holds thousands of galaxies; ours is one of them.
+  var root = n('universe', 'Universe', [milkyWay], {
+    hue: 255,
+    image: 'pictures/atlas/The_Hubble_eXtreme_Deep_Field.jpg',
+    credit: 'Hubble eXtreme Deep Field, NASA / ESA / G. Illingworth, D. Magee, P. Oesch (UC Santa Cruz) / R. Bouwens (Leiden) / HUDF09 Team (public domain)'
+  });
+
+  // Extra words for the "Keyword rain" game: terms that live in captions, long titles or pictures of each area
+  // (the node titles themselves are picked up automatically). Keyed by the area node, which sets the word colour.
+  var keywords = {
+    customers: ['Porter', 'Five forces', 'Value chain', 'Suppliers', 'Buyers', 'Substitutes', 'Rivalry', 'TOGAF', 'DAMA', 'DMBOK',
+      'Governance', 'Stewardship', 'Lineage', 'Architecture'],
+    market: ['SWOT', 'Quadrant', 'Leaders', 'Challengers', 'Visionaries', 'Niche players', 'Knowledge graph', 'Lakehouse',
+      'Data mesh', 'Landscape', 'Weights', 'Honorable'],
+    'product-mgmt': ['TAM', 'SAM', 'SOM', 'Kano', 'Jobs to be Done', 'Double Diamond', 'Discovery', 'Segmentation', 'Benchmarking',
+      'Value effort', 'SEQ', 'SUS', 'CSAT', 'NPS', 'Pirate metrics'],
+    'product-dev': ['Heuristics', 'Typography', 'Accessibility', 'Taxonomies', 'Aesthetic', 'Validation', 'Optimistic', 'Prefetch',
+      'Collections', 'OSI']
+  };
+
+  window.ATLAS = { root: root, links: links, keywords: keywords };
+})();
