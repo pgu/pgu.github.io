@@ -37,6 +37,15 @@ No WebGL and no other flag is needed: everything uses the plain 2D canvas contex
   3. When the animation settles, the panel is drawn once with `drawElementImage` as the real live element, so its chips and Close button are usable.
 - **Why the bitmap copy.** The first version called `drawElementImage` with its source-rect overload (source in CSS px) for each of the 140 strips, which makes the browser re-render the panel 140 times per frame and was visibly jerky. Rendering once and slicing a bitmap fixed it. JavaScript time was about 1 ms per frame either way; the cost was in rasterization.
 
+### Pixel effects that CSS cannot do on real HTML
+
+Because the cards are pixels on a 2D canvas, effects that need access to the rendered image are one line each:
+
+- **Save as image.** The toolbar button copies the canvas to a second one, adds a credit line and calls `toBlob`. The PNG shows the real HTML (fonts, CSS, layout) as the browser rendered it, with no screenshot library. In Chrome 155 `toBlob` and `getImageData` work on canvases containing drawn elements.
+- **Floor reflection.** After the cards are drawn, the strip just above the axis is copied (`drawImage` from the canvas itself) into a small offscreen canvas, flipped, faded with a `destination-in` gradient and drawn back below the cards. One extra bitmap copy per frame, no extra DOM rendering.
+- **Motion trails.** `ctx.reset()` clears the canvas each frame, so the dock area of the previous frame is copied out first and drawn under the new frame at 55% opacity. Cards that move (dock magnification) leave a short fading ghost. This is a feedback buffer: CSS has no equivalent. It is disabled under `prefers-reduced-motion`.
+- Both effects have a checkbox in the toolbar so they can be compared on and off.
+
 ### Gotchas found while building it
 
 - Snapshots are device-pixel sized: with `ctx.scale(devicePixelRatio)` an element drawn with just `(el, x, y)` appears `dpr` times too large. Always pass a destination width and height.
