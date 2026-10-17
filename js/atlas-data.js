@@ -19,11 +19,8 @@
     n('customers', 'Understanding customers', [
       n('porter5', 'The industry', [], { caption: 'Porter\'s five forces', images: [
         pic('c-00-porter-five-forces.jpg', 'Porter\'s five forces model', 'Michael E. Porter\'s model (diagram source unknown)')] }),
-      n('company', 'The company', [
-        n('porter-chain', 'Porter value chain', [], { images: [
-          pic('c-01-porter-value-chain.jpg', 'Porter\'s value chain: primary and support activities, margin', 'Michael E. Porter\'s model (diagram source unknown)')] }),
-        sq('company-map', 'Company map', 'market, mission, business value, departments, flows')
-      ]),
+      n('company', 'The company', [], { caption: 'Porter\'s value chain', images: [
+        pic('c-01-porter-value-chain.jpg', 'Porter\'s value chain: primary and support activities, margin', 'Michael E. Porter\'s model (diagram source unknown)')] }),
       n('togaf', 'Enterprise architecture (TOGAF)', [
         n('business-arch', 'Business architecture'),
         n('data-arch', 'Data architecture'),
@@ -31,12 +28,9 @@
         n('tech-arch', 'Technology architecture')
       ], { images: [
         pic('c-02-togaf.jpg', 'The TOGAF architecture development method (ADM): business, application and technology layers', '© The Open Group, TOGAF® Specification')] }),
-      n('data-in-practice', 'Data stack in practice', [
-        sq('data-stack', 'Data stack overview'),
-        n('stack-personas', 'Personas along the stack', [], { caption: 'operational vs analytical', images: [
-          pic('c-05-data-team.jpg', 'How modern data teams work: architect, engineer, analyst, scientist, BI developer, ML engineer', 'DataWithBaraa, Baraa Khatib Salkini (YouTube: "How Modern Data Teams Work")')] })
-      ], { images: [
-        pic('c-04-life-data.jpg', 'Life of a data: from creation to deletion (ingestion, validation, replication, ETL vs ELT, lineage, tiers)', '© ByteByteGo')] }),
+      n('data-in-practice', 'Data stack in practice', [], { caption: 'personas along the stack', images: [
+        pic('c-04-life-data.jpg', 'Life of a data: from creation to deletion (ingestion, validation, replication, ETL vs ELT, lineage, tiers)', '© ByteByteGo'),
+        pic('c-05-data-team.jpg', 'How modern data teams work: architect, engineer, analyst, scientist, BI developer, ML engineer', 'DataWithBaraa, Baraa Khatib Salkini (YouTube: "How Modern Data Teams Work")')] }),
       n('data-management', 'Data management', [], { caption: 'DAMA', images: [
         pic('c-03-dama-data-mngt.jpg', 'The DAMA data management framework: data governance around lifecycle management and foundational activities', 'DAMA International (DAMA-DMBOK)')] })
     ], { hue: 200 }),
@@ -362,7 +356,7 @@
     { a: 'info-arch', b: 'data-cartography', label: 'metadata and taxonomies' },
     { a: 'api-tech', b: 'analysts', label: 'API market analysis' },
     { a: 'competitor-swot', b: 'analyst-assessments', label: 'my view vs the analysts\' view' },
-    { a: 'stack-personas', b: 'personas', label: 'same personas, customer and analyst views' },
+    { a: 'data-in-practice', b: 'personas', label: 'same personas, customer and analyst views' },
     { a: 'honorable-mentions', b: 'competitors', label: 'today\'s mention, tomorrow\'s competitor' },
     { a: 'trend-architecture', b: 'data-arch', label: 'same subject, two sources' },
     { a: 'loading-states', b: 'frontend-perf', label: 'perceived vs real speed' },
