@@ -28,6 +28,10 @@
   var mouse = null;           // {x, y} in canvas CSS px, or null
   var sel = -1, morphIdx = -1, morphT = 0, morphTarget = 0;
   var shiftCur = 0, mxCur = 0, last = 0;
+  var fx = { refl: true, trails: true, glitch: true };             // effects only possible because the cards are pixels on a canvas
+  var TRAIL = .55, REFL_H = 46, REFL_A = .3;
+  var rgbSrc, rgbCh, glitchAt = 0;                   // RGB split of the expanded panel: scratch canvases, start time
+  var trailOk = false, trailCv, trailCtx, reflCv, reflCtx;            // previous frame (dock area) and a mirrored strip
   var snap, snapCtx, snapDirty = true;   // bitmap copy of the detail panel, so genie strips are cheap drawImage calls
   var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -57,10 +61,7 @@
     return { name: 'this browser', chromium: false };
   }
 
-  function showFallback(err) {
-    stage.hidden = true;
-    note.textContent = '';
-    fallbackEl.hidden = false;
+  function renderFallback(fallbackEl, err, altHref, altLabel) {
     fallbackEl.textContent = '';
     var b = browser();
     fallbackEl.appendChild(el('h2', null, 'This view needs HTML-in-Canvas'));
@@ -93,13 +94,20 @@
     }
     var p = el('p');
     p.appendChild(document.createTextNode('Meanwhile: '));
-    var a = el('a', null, 'regular timeline'); a.href = '#timeline';
+    var a = el('a', null, altLabel || 'regular timeline'); a.href = altHref || '#timeline';
     p.appendChild(a);
     p.appendChild(document.createTextNode(' · '));
     var spec = el('a', null, 'about the proposal'); spec.href = 'https://github.com/WICG/html-in-canvas'; spec.target = '_blank'; spec.rel = 'noopener';
     p.appendChild(spec);
     fallbackEl.appendChild(p);
   }
+  function showFallback(err) {
+    stage.hidden = true;
+    note.textContent = '';
+    fallbackEl.hidden = false;
+    renderFallback(fallbackEl, err);
+  }
+
 
   /* ---------- build ---------- */
   function yearsLabel(j) {
@@ -167,6 +175,7 @@
     detailEl.setAttribute('drawable', '');
     cv.appendChild(detailEl);
 
+    stage.appendChild(buildTools());
     stage.appendChild(cv);
     cv.addEventListener('paint', paint);
     cv.addEventListener('pointermove', function (e) {
@@ -204,8 +213,49 @@
     });
     new ResizeObserver(resize).observe(cv);
     note.textContent = 'Experimental: every card is a live DOM element drawn into a <canvas> with drawElementImage(). ' +
-      'Hover the dock, click a card to expand it, ←/→ to browse, Esc to close.';
+      'Hover the dock, click a card to expand it, ←/→ to browse, Esc to close. Reflection and motion trails are pixel effects applied to the HTML cards.';
     resize();
+  }
+
+  /* ---------- toolbar: export + effects ---------- */
+  function buildTools() {
+    var bar = el('div', 'cv-tools');
+    var save = el('button', 'cv-save', '⬇ Save as image');
+    save.title = 'Download what you see as a PNG: real HTML rendered by the browser, no screenshot library';
+    save.addEventListener('click', saveImage);
+    bar.appendChild(save);
+    [['refl', 'Reflection'], ['trails', 'Motion trails'], ['glitch', 'Glitch on open']].forEach(function (d) {
+      var lab = el('label', 'cv-fx'), cb = el('input');
+      cb.type = 'checkbox'; cb.checked = fx[d[0]];
+      cb.addEventListener('change', function () { fx[d[0]] = cb.checked; if (cv) cv.requestPaint(); });
+      lab.appendChild(cb); lab.appendChild(document.createTextNode(' ' + d[1]));
+      bar.appendChild(lab);
+    });
+    return bar;
+  }
+
+  // The canvas holds the HTML cards as pixels, so exporting is one call: no html2canvas, no re-implemented CSS.
+  function saveImage() {
+    try {
+      var out = document.createElement('canvas');
+      out.width = cv.width; out.height = cv.height;
+      var o = out.getContext('2d');
+      o.drawImage(cv, 0, 0);
+      o.scale(dpr, dpr);
+      o.font = '12px -apple-system, "Segoe UI", sans-serif'; o.textAlign = 'left'; o.textBaseline = 'bottom';
+      o.fillStyle = 'rgba(141,155,184,.9)';
+      o.fillText('Pascal Guilcher · pgu.github.io', 12, H - 8);
+      out.toBlob(function (blob) {
+        if (!blob) { note.textContent = 'Could not export the image in this browser.'; return; }
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'pascal-guilcher-timeline' + (sel >= 0 ? '-' + items[sel].job.id : '') + '.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      }, 'image/png');
+    } catch (err) {
+      note.textContent = 'Export failed: ' + (err && err.message || err);
+    }
   }
 
   function resize() {
@@ -221,6 +271,10 @@
     snap = snap || document.createElement('canvas');
     snap.width = Math.round((W - 2 * PAD) * dpr); snap.height = Math.round((H - PAD - DOCK_H) * dpr);
     snapCtx = snap.getContext('2d'); snapDirty = true;
+    trailCv = trailCv || document.createElement('canvas'); reflCv = reflCv || document.createElement('canvas');
+    trailCv.width = cv.width; trailCv.height = Math.round((DOCK_H + 10) * dpr); trailCtx = trailCv.getContext('2d');
+    reflCv.width = cv.width; reflCv.height = Math.round(REFL_H * dpr); reflCtx = reflCv.getContext('2d');
+    trailOk = false;
     detailEl.style.width = (W - 2 * PAD) + 'px';
     detailEl.style.height = (H - PAD - DOCK_H) + 'px';
     cv.requestPaint();
@@ -229,7 +283,7 @@
   function select(i) {
     sel = i;
     if (i >= 0) {
-      morphIdx = i; morphT = reduced ? 1 : 0; morphTarget = 1;
+      morphIdx = i; morphT = reduced ? 1 : 0; morphTarget = 1; glitchAt = 0;
       buildDetail(items[i].job, items[i].hue);
       snapDirty = true;
     } else morphTarget = 0;
@@ -281,6 +335,47 @@
     }
   }
 
+  // Chromatic aberration + short glitch, played once on the panel when the genie lands.
+  // The panel is already pixels on the canvas, so: copy its rectangle, then rebuild it as three colour channels
+  // (multiply by pure red / green / blue), drawn with additive blending at slightly different offsets.
+  // At offset 0 the sum is exactly the original panel; the effect ends there, so the text is left untouched.
+  var CH = [['#f00', -1], ['#0f0', 0], ['#00f', 1]];
+  function rgbSplit(rx, ry, dw, dh, amp, glitch) {
+    var m = 24, x0 = Math.max(0, Math.floor(rx - m)), y0 = Math.max(0, Math.floor(ry - m));
+    var x1 = Math.min(W, Math.ceil(rx + dw + m)), y1 = Math.min(H, Math.ceil(ry + dh + m));
+    var sx = Math.round(x0 * dpr), sy = Math.round(y0 * dpr), sw = Math.round((x1 - x0) * dpr), sh = Math.round((y1 - y0) * dpr);
+    if (sw < 4 || sh < 4) return;
+    rgbSrc = rgbSrc || document.createElement('canvas'); rgbCh = rgbCh || document.createElement('canvas');
+    if (rgbSrc.width !== sw || rgbSrc.height !== sh) { rgbSrc.width = rgbCh.width = sw; rgbSrc.height = rgbCh.height = sh; }
+    var sc = rgbSrc.getContext('2d'), cc = rgbCh.getContext('2d');
+    sc.clearRect(0, 0, sw, sh); sc.drawImage(cv, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    // glitch: horizontal bands shifted sideways for a few frames
+    var bands = glitch ? 9 : 1, bh = Math.ceil(sh / bands), shift = [];
+    for (var b = 0; b < bands; b++) shift.push(glitch ? Math.round((Math.random() - .5) * 2 * 12 * dpr * glitch) : 0);
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    // only the inner part is rewritten: the copied margin is wider than any shift, so every channel still has pixels
+    // to shift in at the edges (otherwise a one-pixel coloured line shows along the border of the copied area)
+    var inset = Math.round(16 * dpr);
+    ctx.beginPath(); ctx.rect(sx + inset, sy + inset, sw - 2 * inset, sh - 2 * inset); ctx.clip();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#000'; ctx.fillRect(sx, sy, sw, sh);
+    ctx.globalCompositeOperation = 'lighter';
+    CH.forEach(function (c) {
+      cc.globalCompositeOperation = 'source-over';
+      cc.clearRect(0, 0, sw, sh); cc.drawImage(rgbSrc, 0, 0);
+      cc.globalCompositeOperation = 'multiply'; cc.fillStyle = c[0]; cc.fillRect(0, 0, sw, sh);   // keep one channel
+      var dx = Math.round(c[1] * amp * dpr);
+      for (var b = 0; b < bands; b++) {
+        var by = b * bh, hh = Math.min(bh, sh - by);
+        if (hh > 0) ctx.drawImage(rgbCh, 0, by, sw, hh, sx + dx + shift[b], sy + by, sw, hh);
+      }
+    });
+    ctx.restore();
+  }
+
   function paint(e) {
     if (failed) return;
     // Re-snapshot the panel whenever the browser says its rendering changed (content, resize).
@@ -294,6 +389,13 @@
     last = now;
     var k = reduced ? 1 : 1 - Math.exp(-dt * 14);
     var busy = false;
+
+    // trails: keep a copy of the previous frame's dock area before the canvas is cleared
+    var dockY = H - DOCK_H + 10, useTrails = fx.trails && !reduced && trailOk && trailCtx;
+    if (useTrails) {
+      trailCtx.clearRect(0, 0, trailCv.width, trailCv.height);
+      trailCtx.drawImage(cv, 0, Math.round(dockY * dpr), cv.width, trailCv.height, 0, 0, cv.width, trailCv.height);
+    }
 
     ctx.reset();
     ctx.scale(dpr, dpr);
@@ -351,29 +453,18 @@
       ctx.fillText('Hover the dock, click a card to expand it', W / 2, (H - DOCK_H) / 2 + PAD + 130);
     }
 
-    // axis
-    var g = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
-    g.addColorStop(0, 'rgba(56,189,248,0)'); g.addColorStop(.1, 'rgba(56,189,248,.7)');
-    g.addColorStop(.9, 'rgba(56,189,248,.7)'); g.addColorStop(1, 'rgba(56,189,248,0)');
-    ctx.strokeStyle = g; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(PAD, axisY); ctx.lineTo(W - PAD, axisY); ctx.stroke();
+    if (useTrails) {       // ghost of the last frame under the new one: cards that moved leave a fading trail
+      ctx.globalAlpha = TRAIL;
+      ctx.drawImage(trailCv, 0, 0, trailCv.width, trailCv.height, 0, dockY, W, DOCK_H + 10);
+      ctx.globalAlpha = 1;
+    }
 
-    // cards + dots
+    // cards
     items.forEach(function (it, i) {
       var x = cx[i] + shiftCur;
       var dw = it.f * slot * .88, s = dw / CARD_W, dh = CARD_H * s;
       var rx = x - dw / 2, ry = cardBottom - dh;
       it.rect = { x: rx, y: ry, w: dw, h: dh + 30 };
-
-      // dot
-      var hot = i === sel || i === focus;
-      ctx.fillStyle = 'hsl(' + it.hue + ' 70% 62%)';
-      if (hot) { ctx.shadowColor = 'hsl(' + it.hue + ' 80% 60%)'; ctx.shadowBlur = 16; }
-      ctx.beginPath(); ctx.arc(x, axisY, hot ? 6 : 4, 0, 7); ctx.fill();
-      ctx.shadowBlur = 0;
-      if (i === sel) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, axisY, 9, 0, 7); ctx.stroke(); }
-
-      // card
       var alpha = i === morphIdx ? 1 - smooth(0, .15, morphT) : 1;
       if (alpha > .01) {
         // explicit destination size: the snapshot is device-pixel sized, so don't rely on ctx scale
@@ -381,6 +472,39 @@
         ctx.drawElementImage(it.el, rx, ry, dw, dh);
         ctx.restore();
       }
+    });
+
+    // floor reflection: mirror the bottom strip of the cards just drawn, fade it out, put it under the cards
+    if (fx.refl) {
+      var sy = Math.round((cardBottom - REFL_H) * dpr), sh = reflCv.height;
+      reflCtx.globalCompositeOperation = 'source-over';
+      reflCtx.clearRect(0, 0, reflCv.width, reflCv.height);
+      reflCtx.save();
+      reflCtx.translate(0, sh); reflCtx.scale(1, -1);
+      reflCtx.drawImage(cv, 0, sy, cv.width, sh, 0, 0, cv.width, sh);
+      reflCtx.restore();
+      reflCtx.globalCompositeOperation = 'destination-in';
+      var fade = reflCtx.createLinearGradient(0, 0, 0, sh);
+      fade.addColorStop(0, 'rgba(0,0,0,' + REFL_A + ')'); fade.addColorStop(.7, 'rgba(0,0,0,0)'); fade.addColorStop(1, 'rgba(0,0,0,0)');
+      reflCtx.fillStyle = fade; reflCtx.fillRect(0, 0, reflCv.width, sh);
+      ctx.drawImage(reflCv, 0, 0, reflCv.width, sh, 0, cardBottom + 2, W, REFL_H);
+    }
+
+    // axis
+    var g = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
+    g.addColorStop(0, 'rgba(56,189,248,0)'); g.addColorStop(.1, 'rgba(56,189,248,.7)');
+    g.addColorStop(.9, 'rgba(56,189,248,.7)'); g.addColorStop(1, 'rgba(56,189,248,0)');
+    ctx.strokeStyle = g; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(PAD, axisY); ctx.lineTo(W - PAD, axisY); ctx.stroke();
+
+    // dots
+    items.forEach(function (it, i) {
+      var x = cx[i] + shiftCur, hot = i === sel || i === focus;
+      ctx.fillStyle = 'hsl(' + it.hue + ' 70% 62%)';
+      if (hot) { ctx.shadowColor = 'hsl(' + it.hue + ' 80% 60%)'; ctx.shadowBlur = 16; }
+      ctx.beginPath(); ctx.arc(x, axisY, hot ? 6 : 4, 0, 7); ctx.fill();
+      ctx.shadowBlur = 0;
+      if (i === sel) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, axisY, 9, 0, 7); ctx.stroke(); }
     });
 
     // expanding detail panel ("genie": the panel is drawn as horizontal strips that funnel into the dock card)
@@ -410,6 +534,15 @@
         if (t && t.toString) detailEl.style.transform = t.toString();
       }
       ctx.restore();
+      // once the genie has landed: a brief RGB split + glitch on the panel, then back to a clean picture
+      if (morphT >= 1 && morphTarget === 1 && fx.glitch && !reduced) {
+        if (!glitchAt) glitchAt = now;
+        var age = (now - glitchAt) / 1000;
+        if (age < .55) {
+          rgbSplit(mainRect.x, mainRect.y, mainRect.w, mainRect.h, 7 * Math.exp(-age * 7), age < .3 ? 1 - age / .3 : 0);
+          busy = true;
+        }
+      }
       live = morphT === 1 && morphTarget === 1;
     }
     detailEl.classList.toggle('live', live);
@@ -418,10 +551,14 @@
     ctx.fillStyle = 'rgba(141,155,184,.9)'; ctx.font = '11px -apple-system, "Segoe UI", sans-serif';
     ctx.textBaseline = 'top'; ctx.textAlign = 'center';
     items.forEach(function (it, i) {
-      if (it.f > 1.15 || i === sel || i % 2 === 0)
-        ctx.fillText(it.job.start[0], cx[i] + shiftCur, axisY + 14);
+      if (it.f > 1.15 || i === sel || i % 2 === 0) {
+        var tx = cx[i] + shiftCur, ty = axisY + 14;
+        ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(10,18,38,.9)'; ctx.strokeText(it.job.start[0], tx, ty);   // halo keeps the year readable over the reflection
+        ctx.fillText(it.job.start[0], tx, ty);
+      }
     });
 
+    trailOk = true;
     if (busy) cv.requestPaint(); else last = 0;
   }
 
@@ -440,6 +577,7 @@
       try { start(); } catch (err) { failed = true; showFallback(err && err.message || err); }
     } else cv.requestPaint();
   }
+  window.H2C = { hasApi: hasApi, renderFallback: renderFallback };   // shared with the Atlas canvas view
   window.addEventListener('viewchange', function (e) { if (e.detail === 'canvas') show(); });
   if (location.hash === '#canvas') show();
 })();

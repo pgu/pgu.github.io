@@ -215,7 +215,7 @@
   }
 
   /* ---------- routing ---------- */
-  var VIEWS = ['timeline', 'tech', 'geo', 'game', 'atlas', 'canvas'];
+  var VIEWS = ['timeline', 'tech', 'geo', 'game', 'atlas', 'atlas-canvas', 'canvas'];
   function go(v) { if (location.hash !== '#' + v) location.hash = v; else route(); }
   function route() {
     var v = location.hash.replace('#', '');

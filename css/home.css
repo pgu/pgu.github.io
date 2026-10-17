@@ -340,3 +340,15 @@ button.at-tick:hover i { background: var(--accent); }
 .at-toggle.konami { animation: at-konami 1.2s ease-out; }
 @keyframes at-konami { 0% { background: #38bdf866; box-shadow: 0 0 0 6px #38bdf833; } 100% { background: transparent; box-shadow: none; } }
 .at-toggle { padding: 2px 8px; border-radius: 8px; }
+
+.cv-tools { display: flex; align-items: center; gap: 16px; margin: 0 0 8px; flex-wrap: wrap; }
+.cv-save { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 8px; padding: 5px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.cv-save:hover { border-color: var(--accent); color: var(--accent); }
+.cv-fx { color: var(--muted); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.cv-fx input { accent-color: var(--accent); }
+
+/* ---- atlas on canvas ---- */
+.ac-stage { position: relative; height: 600px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #0a1226; }
+.ac-stage canvas { position: relative; display: block; width: 100%; height: 100%; outline: none; }
+.ac-stage canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+#view-atlas-canvas .at-bar { flex-wrap: wrap; }
