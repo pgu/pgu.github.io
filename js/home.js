@@ -49,9 +49,22 @@
   }
 
   /* ---------- timeline ---------- */
+  var details = [];     // { ul, more } of every card that has details, for the global expand / collapse
+
+  function setOpen(d, open) {
+    d.ul.hidden = !open;
+    d.more.textContent = open ? 'Hide details ▴' : 'Show details ▾';
+  }
+  function syncExpandAll() {
+    var all = details.length && details.every(function (d) { return !d.ul.hidden; });
+    $('tl-expand').textContent = all ? 'Collapse all details ▴' : 'Expand all details ▾';
+    $('tl-expand').disabled = !details.length;
+  }
+
   function renderTimeline() {
     var ol = $('timeline');
     ol.textContent = '';
+    details = [];
     JOBS.forEach(function (j) {
       var li = el('li', 'tl-item ' + j.kind + (j.end ? '' : ' current'));
       li.dataset.id = j.id;
@@ -71,10 +84,9 @@
         ul.hidden = true;
         j.points.forEach(function (p) { ul.appendChild(el('li', null, p)); });
         var more = el('button', 'tl-more', 'Show details ▾');
-        more.addEventListener('click', function () {
-          ul.hidden = !ul.hidden;
-          more.textContent = ul.hidden ? 'Show details ▾' : 'Hide details ▴';
-        });
+        var d = { ul: ul, more: more };
+        details.push(d);
+        more.addEventListener('click', function () { setOpen(d, ul.hidden); syncExpandAll(); });
         card.appendChild(more);
         card.appendChild(ul);
       }
@@ -87,6 +99,7 @@
       ol.appendChild(li);
     });
     applyTimelineFilter();
+    syncExpandAll();
   }
 
   function applyTimelineFilter() {
@@ -228,6 +241,12 @@
   }
 
   window.App = { techChip: techChip, fmt: fmt, mIdx: mIdx, duration: duration, NOW_M: NOW_M, MONTHS: MONTHS };
+
+  $('tl-expand').addEventListener('click', function () {
+    var open = !details.every(function (d) { return !d.ul.hidden; });     // everything open already -> close all, else open all
+    details.forEach(function (d) { setOpen(d, open); });
+    syncExpandAll();
+  });
 
   renderHero();
   renderTimeline();
