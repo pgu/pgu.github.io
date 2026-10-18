@@ -1,5 +1,6 @@
 // Profile data, sourced from LinkedIn profile PDF.
 // Dates are [year, month]; end: null = present.
+// In `points`, **double asterisks** mark the keywords highlighted in the card details.
 window.PROFILE = {
   name: 'Pascal Guilcher',
   title: 'Principal Product Designer @ Qlik',
@@ -72,10 +73,10 @@ window.JOBS = [
     start: [2025, 6], end: null, place: 'Nantes, France',
     blurb: 'Designing the user experience of Qlik\'s data integration and management software for data engineers and analysts, with Product Management, UX Research and Engineering.',
     points: [
-      'Explore and design data tooling: DataOps workflows (environments, promotion, versioning), FinOps, "as Code" approaches, the semantic layer, AI-assisted and agentic experiences (MCP, tools, skills).',
-      'Run user research with data engineers; synthesize into prioritized requirements; share through interactive dashboards and reports.',
-      'Market-intelligence practice since 2023: ~2,000 curated entries (Gartner, Forrester, IDC, BARC), teardown boards on Snowflake, Databricks, Microsoft Fabric, MuleSoft, Postman and more.',
-      'Turn that intelligence into design input: personas, ideation memos mapping emerging tech to Qlik and Talend products, cross-vendor comparisons.'
+      'Explore and design **data tooling**: **DataOps** workflows (environments, promotion, versioning), **FinOps**, "as Code" approaches, the **semantic layer**, AI-assisted and **agentic experiences** (MCP, tools, skills).',
+      'Run **user research** with data engineers; synthesize into **prioritized requirements**; share through **interactive dashboards** and reports.',
+      '**Market-intelligence** practice since 2023: **~2,000 curated entries** (Gartner, Forrester, IDC, BARC), **teardown boards** on Snowflake, Databricks, Microsoft Fabric, MuleSoft, Postman and more.',
+      'Turn that intelligence into **design input**: **personas**, ideation memos mapping emerging tech to Qlik and Talend products, cross-vendor comparisons.'
     ],
     tech: ['Figma', 'Miro', 'User research', 'Market intelligence', 'DataOps', 'FinOps', 'Semantic layer', 'MCP', 'AI agents', 'AI-assisted UX', 'Data catalog', 'Data quality']
   },
@@ -84,9 +85,9 @@ window.JOBS = [
     start: [2023, 5], end: [2025, 5], place: 'Nantes, France',
     blurb: 'Front-end engineer on API Designer, working closely with UX and Product.',
     points: [
-      'Designed and built API product features, incl. an AI-assisted API creation flow: requirements and flows in Miro, designs in Figma, user research, in-product guidance with Pendo, React migration from AngularJS.',
-      'Analyzed the API lifecycle ecosystem (OpenAPI, Overlays, Arazzo, TypeSpec) and the Data & Integration markets (iPaaS, API management, RPA, BI, data quality).',
-      'Certified across Talend and Qlik platforms (9 practitioner-level credentials, 2023).'
+      'Designed and built **API product features**, incl. an **AI-assisted API creation flow**: requirements and flows in **Miro**, designs in **Figma**, user research, in-product guidance with **Pendo**, **React migration** from AngularJS.',
+      'Analyzed the **API lifecycle ecosystem** (**OpenAPI**, Overlays, Arazzo, TypeSpec) and the **Data & Integration markets** (iPaaS, API management, RPA, BI, data quality).',
+      '**Certified** across Talend and Qlik platforms (**9 practitioner-level credentials**, 2023).'
     ],
     tech: ['React.js', 'AngularJS', 'JavaScript', 'Figma', 'Miro', 'Pendo', 'User research', 'OpenAPI', 'Overlays', 'Arazzo', 'TypeSpec', 'REST', 'iPaaS', 'API management', 'Market intelligence', 'AI-assisted UX', 'Qlik Sense', 'Data quality', 'Data catalog']
   },
@@ -95,9 +96,9 @@ window.JOBS = [
     start: [2017, 11], end: [2023, 4], place: 'Nantes, France',
     blurb: 'Developer, UX/product designer, UX researcher and competitive-intelligence analyst across API products and data & integration projects. Talend was acquired by Qlik in 2023.',
     points: [
-      'API products: API Designer, Portal, Documentation, Tester, Data APIs (API Creator).',
-      'UXR (interviews, surveys) and market intelligence for Data projects around Stitch (ELT, product-led growth) and Reverse-ETL.',
-      'Market intelligence on the iPaaS market; partnered with CSMs on customer data stacks and integration strategies.'
+      '**API products**: API Designer, Portal, Documentation, Tester, **Data APIs** (API Creator).',
+      '**UXR** (interviews, surveys) and **market intelligence** for Data projects around **Stitch** (ELT, product-led growth) and **Reverse-ETL**.',
+      '**Market intelligence** on the **iPaaS** market; partnered with CSMs on customer data stacks and integration strategies.'
     ],
     tech: ['React.js', 'AngularJS', 'JavaScript', 'Webpack', 'Jenkins', 'Git', 'GitHub', 'REST', 'OpenAPI', 'iPaaS', 'ELT', 'Reverse-ETL', 'Stitch', 'Data quality', 'User research', 'Market intelligence', 'Competitive analysis', 'Figma']
   },
@@ -120,9 +121,9 @@ window.JOBS = [
     start: [2011, 11], end: [2014, 3], place: 'Neuilly-sur-Seine & Lille, France',
     blurb: 'CMS as a SaaS for the leading French player in the international DIY market (~12 senior developers).',
     points: [
-      'Front: AngularJS middle-office webapp and an HTML5 portal of GWT webapps, clients of the API.',
-      'Mobile: Android application. Server: framework producing the business components of the REST API.',
-      'DevOps: Bash scripts automating install and execution of the whole stack.'
+      '**Front**: **AngularJS** middle-office webapp and an HTML5 portal of **GWT** webapps, clients of the API.',
+      '**Mobile**: **Android** application. **Server**: framework producing the business components of the **REST API**.',
+      '**DevOps**: **Bash** scripts automating install and execution of the whole stack.'
     ],
     tech: ['AngularJS', 'Underscore.js', 'JavaScript', 'CSS', 'GWT', 'Java', 'Guava', 'Restlet', 'Spring', 'JUnit', 'Mockito', 'Git', 'GitHub', 'Eclipse', 'IntelliJ IDEA', 'Agile', 'TDD', 'CloudBees', 'Android', 'Bash', 'REST']
   },

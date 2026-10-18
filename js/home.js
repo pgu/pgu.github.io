@@ -49,9 +49,30 @@
   }
 
   /* ---------- timeline ---------- */
+  // **keyword** -> <strong class="kw">; built with DOM nodes, never innerHTML
+  function rich(parent, text) {
+    text.split(/\*\*(.+?)\*\*/).forEach(function (chunk, i) {
+      if (!chunk) return;
+      if (i % 2) parent.appendChild(el('strong', 'kw', chunk)); else parent.appendChild(document.createTextNode(chunk));
+    });
+  }
+
+  var details = [];     // { ul, more } of every card that has details, for the global expand / collapse
+
+  function setOpen(d, open) {
+    d.ul.hidden = !open;
+    d.more.textContent = open ? 'Hide details ▴' : 'Show details ▾';
+  }
+  function syncExpandAll() {
+    var all = details.length && details.every(function (d) { return !d.ul.hidden; });
+    $('tl-expand').textContent = all ? 'Collapse all details ▴' : 'Expand all details ▾';
+    $('tl-expand').disabled = !details.length;
+  }
+
   function renderTimeline() {
     var ol = $('timeline');
     ol.textContent = '';
+    details = [];
     JOBS.forEach(function (j) {
       var li = el('li', 'tl-item ' + j.kind + (j.end ? '' : ' current'));
       li.dataset.id = j.id;
@@ -69,12 +90,11 @@
       if (j.points.length) {
         var ul = el('ul', 'tl-points');
         ul.hidden = true;
-        j.points.forEach(function (p) { ul.appendChild(el('li', null, p)); });
+        j.points.forEach(function (p) { var li = el('li'); rich(li, p); ul.appendChild(li); });
         var more = el('button', 'tl-more', 'Show details ▾');
-        more.addEventListener('click', function () {
-          ul.hidden = !ul.hidden;
-          more.textContent = ul.hidden ? 'Show details ▾' : 'Hide details ▴';
-        });
+        var d = { ul: ul, more: more };
+        details.push(d);
+        more.addEventListener('click', function () { setOpen(d, ul.hidden); syncExpandAll(); });
         card.appendChild(more);
         card.appendChild(ul);
       }
@@ -87,6 +107,7 @@
       ol.appendChild(li);
     });
     applyTimelineFilter();
+    syncExpandAll();
   }
 
   function applyTimelineFilter() {
@@ -227,7 +248,13 @@
     window.dispatchEvent(new CustomEvent('viewchange', { detail: v }));
   }
 
-  window.App = { techChip: techChip, fmt: fmt, mIdx: mIdx, duration: duration, NOW_M: NOW_M, MONTHS: MONTHS };
+  window.App = { rich: rich, techChip: techChip, fmt: fmt, mIdx: mIdx, duration: duration, NOW_M: NOW_M, MONTHS: MONTHS };
+
+  $('tl-expand').addEventListener('click', function () {
+    var open = !details.every(function (d) { return !d.ul.hidden; });     // everything open already -> close all, else open all
+    details.forEach(function (d) { setOpen(d, open); });
+    syncExpandAll();
+  });
 
   renderHero();
   renderTimeline();
