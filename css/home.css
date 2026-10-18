@@ -363,3 +363,6 @@ button.at-tick:hover i { background: var(--accent); }
   .timeline .tl-item.work .tl-card > .tl-more { justify-self: start; }
   .timeline .tl-item.work .tl-card > .tl-tech { grid-column: 2; grid-row: 1 / span 12; margin: 0; padding-left: 18px; border-left: 1px solid var(--line); align-self: stretch; }
 }
+
+/* keywords highlighted in the details of the timeline cards (and in the canvas timeline detail) */
+.tl-points strong.kw { color: var(--text); font-weight: 400; background: linear-gradient(transparent 62%, #38bdf838 0); padding: 0 1px; }

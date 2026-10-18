@@ -49,6 +49,14 @@
   }
 
   /* ---------- timeline ---------- */
+  // **keyword** -> <strong class="kw">; built with DOM nodes, never innerHTML
+  function rich(parent, text) {
+    text.split(/\*\*(.+?)\*\*/).forEach(function (chunk, i) {
+      if (!chunk) return;
+      if (i % 2) parent.appendChild(el('strong', 'kw', chunk)); else parent.appendChild(document.createTextNode(chunk));
+    });
+  }
+
   var details = [];     // { ul, more } of every card that has details, for the global expand / collapse
 
   function setOpen(d, open) {
@@ -82,7 +90,7 @@
       if (j.points.length) {
         var ul = el('ul', 'tl-points');
         ul.hidden = true;
-        j.points.forEach(function (p) { ul.appendChild(el('li', null, p)); });
+        j.points.forEach(function (p) { var li = el('li'); rich(li, p); ul.appendChild(li); });
         var more = el('button', 'tl-more', 'Show details ▾');
         var d = { ul: ul, more: more };
         details.push(d);
@@ -240,7 +248,7 @@
     window.dispatchEvent(new CustomEvent('viewchange', { detail: v }));
   }
 
-  window.App = { techChip: techChip, fmt: fmt, mIdx: mIdx, duration: duration, NOW_M: NOW_M, MONTHS: MONTHS };
+  window.App = { rich: rich, techChip: techChip, fmt: fmt, mIdx: mIdx, duration: duration, NOW_M: NOW_M, MONTHS: MONTHS };
 
   $('tl-expand').addEventListener('click', function () {
     var open = !details.every(function (d) { return !d.ul.hidden; });     // everything open already -> close all, else open all

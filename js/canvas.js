@@ -130,7 +130,7 @@
     if (j.blurb) body.appendChild(el('p', 'tl-blurb', j.blurb));
     if (j.points.length) {
       var ul = el('ul', 'tl-points');
-      j.points.forEach(function (t) { ul.appendChild(el('li', null, t)); });
+      j.points.forEach(function (t) { var li = el('li'); A.rich(li, t); ul.appendChild(li); });
       body.appendChild(ul);
     }
     if (j.tech.length) {
